@@ -9,6 +9,10 @@ kickfyne only does 4 things
 1. Builds and manages messages and message handlers.
 1. Builds and manages data records and data stores.
 
+This is version 0.1.0.
+
+All of the usage documentation is in kickfyne but I will probably build a how to wiki as I am building another app while I test and experiment with kickfyne.
+
 ## Framework summary
 
 All of the application code is contained in 3 folders.
