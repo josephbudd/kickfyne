@@ -5,13 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/josephbudd/kickfyne/source/shared/store/record"
-	"github.com/josephbudd/kickfyne/source/shared/store/storer"
-	"github.com/josephbudd/kickfyne/source/shared/store/storing"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
-var defaultRecordNames = []string{utils.StateRecordName}
+var defaultRecordNames = []string{}
 
 func Build(
 	importPrefix string,
@@ -26,21 +23,6 @@ func Build(
 
 	// stores.go
 	if err = buildStoresGo(importPrefix, folderPaths); err != nil {
-		return
-	}
-
-	// shared/store/record/
-	if err = record.Build(folderPaths); err != nil {
-		return
-	}
-
-	// shared/store/storer/
-	if err = storer.Build(importPrefix, folderPaths); err != nil {
-		return
-	}
-
-	// shared/store/storing/
-	if err = storing.Build(importPrefix, folderPaths); err != nil {
 		return
 	}
 

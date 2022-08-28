@@ -32,7 +32,6 @@ var (
 	sharedStoreRecord  = filepath.Join(sharedStore, "record")
 	sharedStoreStorer  = filepath.Join(sharedStore, "storer")
 	sharedStoreStoring = filepath.Join(sharedStore, "storing")
-	sharedState        = filepath.Join(FolderNameShared, "state")
 )
 
 type FolderPaths struct {
@@ -50,7 +49,6 @@ type FolderPaths struct {
 	SharedMessage                                                         string
 	SharedPaths                                                           string
 	SharedStore, SharedStoreRecord, SharedStoreStorer, SharedStoreStoring string
-	SharedState                                                           string
 }
 
 func BuildFolderPaths(rootPath string) (folderPaths *FolderPaths, err error) {
@@ -86,7 +84,6 @@ func BuildFolderPaths(rootPath string) (folderPaths *FolderPaths, err error) {
 		SharedStoreRecord:  filepath.Join(rootPath, sharedStoreRecord),
 		SharedStoreStorer:  filepath.Join(rootPath, sharedStoreStorer),
 		SharedStoreStoring: filepath.Join(rootPath, sharedStoreStoring),
-		SharedState:        filepath.Join(rootPath, sharedState),
 	}
 
 	var isBuilt bool
@@ -160,9 +157,6 @@ func BuildFolderPaths(rootPath string) (folderPaths *FolderPaths, err error) {
 		return
 	}
 	if err = os.Mkdir(folderPaths.SharedStoreStoring, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.SharedState, DMode); err != nil {
 		return
 	}
 	return

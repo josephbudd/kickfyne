@@ -7,7 +7,7 @@ import (
 
 const (
 	versionNewBreakingAPI  = 0
-	versionAPIAddedFeature = 1
+	versionAPIAddedFeature = 2
 	varsionAPIBugFix       = 0
 )
 

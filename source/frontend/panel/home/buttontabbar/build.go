@@ -50,18 +50,6 @@ func Build(
 		return
 	}
 
-	// home/<home button name>TabBar/stateHandler.go.
-	oPath = filepath.Join(tabbarPackagePath, staterFileName)
-	data = staterTemplateData{
-		HomeButtonName: homeButtonName,
-		ImportPrefix:   importPrefix,
-		PackageName:    tabbarPackageName,
-		Funcs:          utils.GetFuncs(),
-	}
-	if err = utils.ProcessTemplate(staterFileName, oPath, staterTemplate, data); err != nil {
-		return
-	}
-
 	// home/<home button name>TabBar/messageHandler.go.
 	oPath = filepath.Join(tabbarPackagePath, messengerFileName)
 	data = messengerTemplateData{

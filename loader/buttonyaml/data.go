@@ -40,7 +40,6 @@ panels:
     ⬫ A description of the panel's unique purpose.
   ◊ A panel group does not just have your panels. It also has:
     ⬫ A messenger which communicates with the back end using messages.
-    ⬫ A stater which communicates with the state.
 
 
 📄 BUTTON YAML FILE EXAMPLE 1 - A BUTTON WITH PANELS:
@@ -101,7 +100,6 @@ panels:
     ⬫ A description of the panel's unique purpose.
   ◊ A panel group does not just have your panels. It also has:
     ⬫ A messenger which communicates with the back end using messages.
-    ⬫ A stater which communicates with the state.
 
 📄 BUTTON YAML FILE EXAMPLE 2 - ADD A BUTTON WITH TABS:
   

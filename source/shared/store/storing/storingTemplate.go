@@ -142,8 +142,9 @@ func (store *{{ .RecordName }}Store) Get(id uint64) (r record.{{ .RecordName }},
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
-	for _, r = range store.data.Records {
-		if r.ID == id {
+	for _, rec := range store.data.Records {
+		if rec.ID == id {
+			r = rec
 			return
 		}
 	}
@@ -165,7 +166,8 @@ func (store *{{ .RecordName }}Store) GetAll() (rr []record.{{ .RecordName }}, er
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
-	rr = store.data.Records
+	rr = make([]record.{{ .RecordName }}, len(store.data.Records))
+	copy(rr, store.data.Records)
 	return
 }
 

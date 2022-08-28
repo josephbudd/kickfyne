@@ -1,9 +1,5 @@
 package storer
 
-const (
-	folderName = "storer"
-)
-
 type templateData struct {
 	ImportPrefix    string
 	RecordName      string
@@ -35,6 +31,9 @@ type {{ .RecordName }}Storer interface {
 
 	// IsFull returns if the store is full.
 	IsFull() (isFull bool)
+
+	// NextID returns the next available ID or an error.
+	NextID() (nextID uint64, err error)
 
 	// Get retrieves one record.{{ .RecordName }} from the data-store.
 	// Param id is the record ID.

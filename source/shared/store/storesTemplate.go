@@ -11,13 +11,13 @@ type storesTemplateData struct {
 	RecordNamesColonPadded map[string]string
 }
 
-var storesTemplate = `{{ $DOT := . }}package store
+var storesTemplate = `{{ $DOT := . }}{{ $haveRecords := ne (len .RecordNamesPadded) 0 }}package store
 
 import (
 	"fmt"
-	"strings"
+	"strings"{{ if $haveRecords }}
 
-	"{{ .ImportPrefix }}/shared/store/storing"
+	"{{ .ImportPrefix }}/shared/store/storing"{{ end }}
 )
 
 // Stores is each of the application's storers.
@@ -44,15 +44,12 @@ func (stores *Stores) Open() (err error) {
 			msg := strings.Join(errList, "\n")
 			err = fmt.Errorf("stores.Open: %s", msg)
 		}
-	}()
-
+	}(){{ if $haveRecords }}
 
 	// Local yaml stores.{{ range $name, $colonPadded := .RecordNamesColonPadded }}
-
-	
 	if err = stores.{{ $name }}.Open(); err != nil {
 		errList = append(errList, err.Error())
-	}{{ end }}
+	}{{ end }}{{ end }}
 
 	return
 }
@@ -67,12 +64,12 @@ func (stores *Stores) Close() (err error) {
 			msg := strings.Join(errList, "\n")
 			err = fmt.Errorf("stores.Close: %s", msg)
 		}
-	}()
+	}(){{ if $haveRecords }}
 
-	// Local yaml stores.{ {{- range $name, $colonPadded := .RecordNamesColonPadded }}
+	// Local yaml stores. {{- range $name, $colonPadded := .RecordNamesColonPadded }}
 	if err = stores.{{ $name }}.Close(); err != nil {
 		errList = append(errList, err.Error())
-	}{{ end }}
+	}{{ end }}{{ end }}
 
 	return
 }

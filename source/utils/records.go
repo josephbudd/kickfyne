@@ -7,10 +7,8 @@ import (
 )
 
 const (
-	folderName              = "storer"
-	goExt                   = ".go"
-	StateRecordName         = "State"
-	StateRecordNameInvalidF = "The record name %q belongs to the framework and is used for the application state."
+	folderName = "storer"
+	goExt      = ".go"
 )
 
 var lExt = len(goExt)
@@ -29,16 +27,7 @@ func UserRecordNames(folderPaths *FolderPaths) (recordNames []string, err error)
 		}
 	}()
 
-	var allRecordNames []string
-	if allRecordNames, err = AllRecordNames(folderPaths); err != nil {
-		return
-	}
-	recordNames = make([]string, 0, len(allRecordNames)-1)
-	for _, recordName := range allRecordNames {
-		if recordName != StateRecordName {
-			recordNames = append(recordNames, recordName)
-		}
-	}
+	recordNames, err = AllRecordNames(folderPaths)
 	return
 }
 
@@ -80,11 +69,6 @@ func ValidateNewRecordName(
 
 	lc := strings.ToLower(recordName)
 
-	if lc == strings.ToLower(StateRecordName) {
-		isValid = false
-		userMessage = fmt.Sprintf(StateRecordNameInvalidF, recordName)
-	}
-
 	if isValid, userMessage = validateName(recordName); !isValid {
 		return
 	}
@@ -115,11 +99,6 @@ func ValidateCurrentRecordName(
 			err = fmt.Errorf("utils.ValidateRecordName: %w", err)
 		}
 	}()
-
-	if recordName == StateRecordName {
-		userMessage = fmt.Sprintf(StateRecordNameInvalidF, recordName)
-		return
-	}
 
 	if isValid, userMessage = validateName(recordName); !isValid {
 		return

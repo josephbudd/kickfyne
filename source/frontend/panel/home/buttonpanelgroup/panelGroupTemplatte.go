@@ -17,7 +17,6 @@ const (
 	groupFileName = "panelGroup.go"
 
 	groupTemplate = `// Package {{ .PackageName }} is the {{ .HomeButtonName }} home button's panel group.
-// State is read only and may effect how panels are updated.
 // Messages received can effect how panels are updated.
 // User input is relayed to the backend using messages sent.
 package {{ .PackageName }}
@@ -49,7 +48,6 @@ func init() {
 // Init .
 // Init initializes this panel group.
 // * It initialiizes each panel in this panel group.
-// * It starts the stater.
 // * It starts the messenger.
 // Returns the error.
 func (bldr *home{{ .HomeButtonName }}PanelGroup) Init(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window) (err error) {
@@ -66,8 +64,6 @@ func (bldr *home{{ .HomeButtonName }}PanelGroup) Init(ctx context.Context, ctxCa
 		panelBuilder.Init(ctx, ctxCancel, app, w)
 	}
 
-	// Start the stater so it's communicating with the state.
-	stater.listen()
 	// Start the messenger so it's communicating with the back end.
 	err = messenger.listen()
 	return

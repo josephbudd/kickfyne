@@ -6,7 +6,6 @@ import (
 
 	"github.com/josephbudd/kickfyne/source/shared/message"
 	"github.com/josephbudd/kickfyne/source/shared/paths"
-	"github.com/josephbudd/kickfyne/source/shared/state"
 	"github.com/josephbudd/kickfyne/source/shared/store"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
@@ -48,11 +47,6 @@ func BuildShared(
 
 	// shared/paths/
 	if err = paths.Build(appName, folderPaths); err != nil {
-		return
-	}
-
-	// shared/state/
-	if err = state.Build(importPrefix, folderPaths); err != nil {
 		return
 	}
 

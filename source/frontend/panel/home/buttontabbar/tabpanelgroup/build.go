@@ -47,16 +47,6 @@ func Build(
 		return
 	}
 
-	// home/<home button name>TabBar/<tab name>PanelGroup/stateHandler.go
-	fPath = filepath.Join(panelGroupPackagePath, staterFileName)
-	staterData := staterTemplateData{
-		PackageName:  panelGroupPackageName,
-		ImportPrefix: importPrefix,
-	}
-	if err = utils.ProcessTemplate(staterFileName, fPath, staterTemplate, staterData); err != nil {
-		return
-	}
-
 	// home/<home button name>TabBar/<tab name>PanelGroup/messageHandler.go
 	fPath = filepath.Join(panelGroupPackagePath, messengerFileName)
 	messengerdata := messengerTemplateData{

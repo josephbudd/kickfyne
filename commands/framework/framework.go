@@ -9,7 +9,9 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
-const Cmd = "framework"
+const (
+	Cmd = "framework"
+)
 
 func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, importPrefix string, folderPaths *utils.FolderPaths) (err error) {
 	if isBuilt {

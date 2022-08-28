@@ -89,7 +89,6 @@ The frontend is made with a single button-pad, tab-bars and panel-groups.
   Each panel in a panel-group has it's own unique design and purpose that you control.
   The framework gives each panel-group:
     * it's own messenger which communicates with the back-end.
-    * it's own stater which communicates with the state.
 
 MANAGING THE FRONT END:
 `

@@ -61,8 +61,6 @@ const (
 			}
 		}
 	
-		// Start the stater so it's communicating with the state.
-		stater.listen()
 		// Start the messenger so it's communicating with the back end.
 		err = messenger.listen()
 		return
