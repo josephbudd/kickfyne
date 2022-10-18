@@ -47,7 +47,7 @@ func Start(ctx context.Context, ctxCancel context.CancelFunc, errCh chan error) 
 	}
 
 	// Messages.
-	txrx.Listen(ctx, ctxCancel, stores)
+	txrx.StartReceiver(ctx, ctxCancel, stores)
 	return
 }
 

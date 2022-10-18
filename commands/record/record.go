@@ -16,7 +16,13 @@ const (
 	verbHelp   = "help"
 )
 
-func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, importPrefix string, folderPaths *utils.FolderPaths) (err error) {
+// Handler handles all record commands.
+func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (err error) {
+
+	if len(args) == 0 {
+		fmt.Println(Usage())
+		return
+	}
 
 	defer func() {
 		if err != nil {
@@ -24,20 +30,18 @@ func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, i
 		}
 	}()
 
-	if len(args) == 0 {
-		dumperCh <- "Missing the verb."
-		dumperCh <- Usage()
-		return
-	}
 	switch args[0] {
 	case verbAdd:
 		if !isBuilt {
-			dumperCh <- "The app must be initailized before a record can be added."
+			fmt.Println("The app must be initailized before a record can be added.")
 			return
 		}
 		if len(args) < 2 {
-			dumperCh <- "Missing the record name."
-			dumperCh <- Usage()
+			fmt.Println(Usage())
+			return
+		}
+		var folderPaths *utils.FolderPaths
+		if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
 			return
 		}
 		var isValid bool
@@ -46,22 +50,25 @@ func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, i
 			return
 		}
 		if !isValid {
-			dumperCh <- errMessage
+			fmt.Println(errMessage)
 			return
 		}
 		// Add a record.
 		if err = source.AddRecord(args[1], importPrefix, folderPaths); err != nil {
 			return
 		}
-		dumperCh <- fmt.Sprintf("Success. Record named %q added.", args[1])
+		fmt.Printf("Success. Record named %q added.\n", args[1])
 	case verbRemove:
 		if !isBuilt {
-			dumperCh <- "The app must be initailized before a record can be removed."
+			fmt.Println("The app must be initailized before a record can be removed.")
 			return
 		}
 		if len(args) < 2 {
-			dumperCh <- "Missing the record name."
-			dumperCh <- Usage()
+			fmt.Println(Usage())
+			return
+		}
+		var folderPaths *utils.FolderPaths
+		if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
 			return
 		}
 		var isValid bool
@@ -70,38 +77,42 @@ func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, i
 			return
 		}
 		if !isValid {
-			dumperCh <- errMessage
+			fmt.Println(errMessage)
 			return
 		}
 		// Remove a record.
 		if err = source.RemoveRecord(args[1], importPrefix, folderPaths); err != nil {
 			return
 		}
-		dumperCh <- fmt.Sprintf("Success. Record named %q removed.", args[1])
+		fmt.Printf("Success. Record named %q removed.", args[1])
 	case verbList:
 		if !isBuilt {
-			dumperCh <- "The app must be initailized before a record names can be listed."
+			fmt.Println("The app must be initailized before a record names can be listed.")
+			return
+		}
+		var folderPaths *utils.FolderPaths
+		if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
 			return
 		}
 		// List all of the records.
 		var recordNames []string
-		if recordNames, err = utils.UserRecordNames(folderPaths); err != nil {
+		if recordNames, err = utils.RecordNames(folderPaths); err != nil {
 			return
 		}
-		dumperCh <- fmt.Sprintf("There are %d record names:\n", len(recordNames))
+		fmt.Printf("There are %d record names:\n", len(recordNames))
 		for i, recordName := range recordNames {
 			j := i + 1
 			switch {
 			case j < 10:
-				dumperCh <- fmt.Sprintf("  %d  %s\n", j, recordName)
+				fmt.Printf("  %d  %s\n", j, recordName)
 			default:
-				dumperCh <- fmt.Sprintf("  %d %s\n", j, recordName)
+				fmt.Printf("  %d %s\n", j, recordName)
 			}
 		}
 	case verbHelp:
-		dumperCh <- Usage()
+		fmt.Println(Usage())
 	default:
-		dumperCh <- fmt.Sprintf("\nUnknown command %q.\n", args[0])
+		fmt.Printf("\nUnknown command %q.\n", args[0])
 	}
 	return
 }

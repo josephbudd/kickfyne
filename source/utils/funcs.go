@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -9,6 +8,7 @@ const (
 	ucAlphabet  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	digits      = "1234567890"
 	asciiSpaces = " \t\r\n\v\f"
+	puncts      = "`~!@#$%^&*()_-+={[]}|\\:;\"'<>,.?/"
 )
 
 // inValidNames must be all lowercase.
@@ -27,6 +27,40 @@ type Funcs struct {
 	Inc            func(i int) (newI int)
 	Comment        func(string) string
 	Cap            func(string) string
+
+	Prefix            func(s string, prefix string) (prefixed string)
+	Suffix            func(s string, suffix string) (suffixed string)
+	PrefixSuffix      func(s string, prefix, suffix string) (fixed string)
+	SuffixLowerCase   func(s string, suffix string) (lowerCased string)
+	CapSuffix         func(s string, suffix string) (capped string)
+	DeCapSuffix       func(s string, suffix string) (decapped string)
+	PrefixLowerCase   func(s string, prefix string) (lowerCased string)
+	PrefixCap         func(s string, prefix string) (capped string)
+	PrefixDeCap       func(s string, prefix string) (decapped string)
+	PrefixCapSuffix   func(s string, prefix, suffix string) (capped string)
+	PrefixDeCapSuffix func(s string, prefix, suffix string) (decapped string)
+
+	PadSlice             func(slice []string) (padded []string)
+	SuffixSlice          func(slice []string, suffix string) (suffixed []string)
+	SuffixPadSlice       func(slice []string, suffix string) (padded []string)
+	SuffixLowerCaseSlice func(slice []string, suffix string) (lowerCased []string)
+	DeCapSuffixSlice     func(slice []string, suffix string) (suffixed []string)
+	CapSuffixSlice       func(slice []string, suffix string) (suffixed []string)
+	DeCapPadSlice        func(slice []string) (padded []string)
+	CapPadSlice          func(slice []string) (padded []string)
+	DeCapSuffixPadSlice  func(slice []string, suffix string) (suffixed []string)
+	CapSuffixPadSlice    func(slice []string, suffix string) (suffixed []string)
+
+	PrefixPadSlice            func(slice []string, prefix string) (padded []string)
+	PrefixLowerCaseSlice      func(slice []string, prefix string) (lowerCased []string)
+	PrefixSuffixSlice         func(slice []string, prefix, suffix string) (suffixed []string)
+	PrefixSuffixPadSlice      func(slice []string, prefix, suffix string) (padded []string)
+	PrefixDeCapSuffixSlice    func(slice []string, prefix, suffix string) (suffixed []string)
+	PrefixCapSuffixSlice      func(slice []string, prefix, suffix string) (suffixed []string)
+	PrefixDeCapPadSlice       func(slice []string, prefix string) (padded []string)
+	PrefixCapPadSlice         func(slice []string, prefix string) (padded []string)
+	PrefixDeCapSuffixPadSlice func(slice []string, prefix, suffix string) (suffixed []string)
+	PrefixCapSuffixPadSlice   func(slice []string, prefix, suffix string) (suffixed []string)
 }
 
 func GetFuncs() (funcs Funcs) {
@@ -39,124 +73,40 @@ func GetFuncs() (funcs Funcs) {
 		Inc:            IncInt,
 		Comment:        comment,
 		Cap:            Cap,
-	}
-	return
-}
 
-func comment(desc string) (comment string) {
-	descs := strings.Split(desc, "\n")
-	comments := make([]string, 0, len(descs))
-	// Find the last line.
-	var last int
-	for last = len(descs) - 1; last >= 0; last-- {
-		if d := descs[last]; len(d) > 0 {
-			break
-		}
-	}
-	// Comment each line.
-	for i := 0; i <= last; i++ {
-		d := strings.TrimRight(descs[i], asciiSpaces)
-		c := fmt.Sprintf("// " + d)
-		comments = append(comments, c)
-	}
-	comment = strings.Join(comments, "\n")
-	return
-}
+		Prefix:            Prefix,
+		Suffix:            Suffix,
+		PrefixSuffix:      PrefixSuffix,
+		SuffixLowerCase:   SuffixLowerCase,
+		CapSuffix:         CapSuffix,
+		DeCapSuffix:       DeCapSuffix,
+		PrefixLowerCase:   PrefixLowerCase,
+		PrefixCap:         PrefixCap,
+		PrefixDeCap:       PrefixDeCap,
+		PrefixCapSuffix:   PrefixCapSuffix,
+		PrefixDeCapSuffix: PrefixDeCapSuffix,
 
-func Cap(name string) (capped string) {
-	capped = strings.ToUpper(name[:1]) + name[1:]
-	return
-}
+		PadSlice:             PadSlice,
+		SuffixSlice:          SuffixSlice,
+		SuffixPadSlice:       SuffixPadSlice,
+		SuffixLowerCaseSlice: SuffixLowerCaseSlice,
+		CapSuffixSlice:       CapSuffixSlice,
+		DeCapSuffixSlice:     DeCapSuffixSlice,
+		CapSuffixPadSlice:    CapSuffixPadSlice,
+		DeCapPadSlice:        DeCapPadSlice,
+		CapPadSlice:          CapPadSlice,
+		DeCapSuffixPadSlice:  DeCapSuffixPadSlice,
 
-func DeCap(name string) (decapped string) {
-	decapped = strings.ToLower(name[:1]) + name[1:]
-	return
-}
-
-// LabelToVarName converts a label to a valid varName
-// Ex: "helllo world." to "helloWorld"
-func LabelToVarName(label string) (varName string) {
-	name := LabelToName(label)
-	// Lower case camel.
-	varName = strings.ToLower(name[:1]) + name[1:]
-	return
-}
-
-// LabelToName converts a label to a valid name.
-// Ex: "helllo world." to "HelloWorld"
-// err is nil or contains the error message for the user.
-func LabelToName(label string) (name string) {
-	validNameChars := make([]string, 0, len(label))
-	var started bool
-	var followingSpace bool
-	for i := range label {
-		ch := label[i : i+1]
-		switch {
-		case strings.Contains(asciiSpaces, ch):
-			followingSpace = true
-			// No white spaces and punctuation allowed.
-		case !started:
-			// The first character must be a capital letter.
-			switch {
-			case strings.Contains(ucAlphabet, ch):
-				started = true
-				followingSpace = false
-				validNameChars = append(validNameChars, ch)
-			case strings.Contains(lcAlphabet, ch):
-				started = true
-				followingSpace = false
-				validNameChars = append(validNameChars, strings.ToUpper(ch))
-			}
-		case started:
-			// Only characters and numbers follow the first capitalized letter.
-			switch {
-			case strings.Contains(ucAlphabet, ch):
-				validNameChars = append(validNameChars, ch)
-				followingSpace = false
-			case strings.Contains(lcAlphabet, ch):
-				if followingSpace {
-					// Enforce camel case.
-					ch = strings.ToUpper(ch)
-					followingSpace = false
-				}
-				validNameChars = append(validNameChars, ch)
-			case strings.Contains(digits, ch):
-				validNameChars = append(validNameChars, ch)
-				followingSpace = false
-			}
-		}
-	}
-	name = strings.Join(validNameChars, "")
-	return
-}
-
-// validateName returns is the name is valid.
-// userMessage contains the error message for the user.
-func validateName(name string) (isValid bool, userMessage string) {
-	lines := make([]string, 0, 2)
-	var msg string
-	s := name[:1]
-	isValid = true
-	if !strings.Contains(ucAlphabet, s) {
-		msg = "A name must begin with a capital letter."
-		lines = append(lines, msg)
-		isValid = false
-	}
-	if strings.ContainsAny(name, asciiSpaces) {
-		msg = "A name must not contain any white space."
-		lines = append(lines, msg)
-		isValid = false
-	}
-	lcName := strings.ToLower(name)
-	for _, inValidName := range inValidNames {
-		if inValidName == lcName {
-			msg = fmt.Sprintf("The name %q can not be used.", name)
-			lines = append(lines, msg)
-			isValid = false
-		}
-	}
-	if !isValid {
-		userMessage = strings.Join(lines, "\n")
+		PrefixPadSlice:            PrefixPadSlice,
+		PrefixLowerCaseSlice:      PrefixLowerCaseSlice,
+		PrefixSuffixSlice:         PrefixSuffixSlice,
+		PrefixSuffixPadSlice:      PrefixSuffixPadSlice,
+		PrefixCapSuffixSlice:      PrefixCapSuffixSlice,
+		PrefixDeCapSuffixSlice:    PrefixDeCapSuffixSlice,
+		PrefixCapSuffixPadSlice:   PrefixCapSuffixPadSlice,
+		PrefixDeCapPadSlice:       PrefixDeCapPadSlice,
+		PrefixCapPadSlice:         PrefixCapPadSlice,
+		PrefixDeCapSuffixPadSlice: PrefixDeCapSuffixPadSlice,
 	}
 	return
 }

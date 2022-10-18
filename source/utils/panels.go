@@ -2,201 +2,128 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"strings"
 )
 
-const (
-	PanelFileSuffix = "Panel.go"
-)
-
-// PanelNames returns each of the current panel folder names.
-func PanelNames(panelGroupFolderPath string) (panelNames []string, err error) {
+// PanelNames returns each of the current panel names.
+func PanelNames(screenPackageFolderPath string) (panelNames []string, err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("PanelNames: %w", err)
+			err = fmt.Errorf("panelNames: %w", err)
 		}
 	}()
 
 	var fileNames []string
-	fileNames, err = FileNames(panelGroupFolderPath)
+	fileNames, err = FileNames(screenPackageFolderPath)
 	panelNames = make([]string, 0, len(fileNames))
 	for _, fileName := range fileNames {
 		var trimmed string
-		if fileName == PanelFileSuffix {
-			// Not a panel file.
+		if fileName == panelFileSuffix {
+			// This is not a panel file name.
 			continue
 		}
-		// Does this panel file name use a valid panel name.
-		trimmed = strings.TrimSuffix(fileName, PanelFileSuffix)
+		trimmed = strings.TrimSuffix(fileName, panelFileSuffix)
 		if trimmed != fileName {
-			panelNames = append(panelNames, Cap(trimmed))
+			// This file name has the panel file name suffix.
+			// This might be a panel file name.
+			panelName := strings.TrimSuffix(fileName, goFileExt)
+			panelNames = append(panelNames, panelName)
 		}
 	}
 	return
 }
 
-// ValidateNewButtonPanelName validates a new panel name for a button's panel group.
-func ValidateNewButtonPanelName(
-	buttonName string,
+func IsFrameWorkPanelName(panelName string) (is bool) {
+	switch panelName {
+	case AccordionPanelName:
+		is = true
+	case AppTabsPanelName:
+		is = true
+	case DocTabsPanelName:
+		is = true
+	}
+	return
+}
+
+// ValidateNewScreenPanelName validates a new panel name for a screenName.
+func ValidateNewScreenPanelName(
+	screenPackageName string,
 	panelName string,
 	folderPaths *FolderPaths,
 ) (isValid bool, failureMessage string, err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("ValidateNewButtonPanelName: %w", err)
+			err = fmt.Errorf("ValidateNewScreenPanelName: %w", err)
 		}
 	}()
 
-	var buttonFolderPath string
-	if _, buttonFolderPath, err = ButtonFileFolderPaths(buttonName, folderPaths); err != nil {
+	if isValid = !IsFrameWorkPanelName(panelName); !isValid {
+		failureMessage = fmt.Sprintf("The panel name %q is reserved for the framework.", panelName)
 		return
 	}
-	buttonHasPanelGroup := filepath.Base(buttonFolderPath) == ButtonPanelGroupFolderName(buttonName)
+
+	if isValid, failureMessage = validateScreenPanelName(panelName); !isValid {
+		return
+	}
+
+	screenPackageFolderPath := filepath.Join(folderPaths.FrontendGUIScreens, screenPackageName)
 	var currentPanelNames []string
-	// This panel is to be added to a button panel group.
-	if !buttonHasPanelGroup {
-		failureMessage = fmt.Sprintf("The button named %q has tabs not panels.", buttonName)
-		return
-	}
-	// The panel name must be new to this button's panel group.
-	if currentPanelNames, err = PanelNames(buttonFolderPath); err != nil {
+	if currentPanelNames, err = PanelNames(screenPackageFolderPath); err != nil {
 		return
 	}
 	for _, currentPanelName := range currentPanelNames {
-		if currentPanelName == panelName {
-			failureMessage = fmt.Sprintf("The button named %q already has a panel named %q", buttonName, panelName)
+		if panelName == currentPanelName {
+			// This is not a new panel name.
+			isValid = false
+			failureMessage = fmt.Sprintf("The screen package %q already has a panel named %q.", screenPackageName, panelName)
 			return
 		}
 	}
-	// Not a current button panel name.
+	// This is a new panel name.
 	isValid = true
 	return
 }
 
-// ValidateCurrentButtonPanelName validates a new panel name for a button's panel group.
-func ValidateCurrentButtonPanelName(
-	buttonName string,
+// ValidateCurrentScreenPanelName validates a new panel name for a screenName.
+func ValidateCurrentScreenPanelName(
+	screenPackageName string,
 	panelName string,
 	folderPaths *FolderPaths,
 ) (isValid bool, failureMessage string, err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("ValidateCurrentButtonPanelName: %w", err)
+			err = fmt.Errorf("ValidateCurrentScreenPanelName: %w", err)
 		}
 	}()
 
-	var buttonFolderPath string
-	if _, buttonFolderPath, err = ButtonFileFolderPaths(buttonName, folderPaths); err != nil {
+	if isValid = !IsFrameWorkPanelName(panelName); !isValid {
+		failureMessage = fmt.Sprintf("The panel name %q is reserved for the framework.", panelName)
 		return
 	}
-	buttonHasPanelGroup := filepath.Base(buttonFolderPath) == ButtonPanelGroupFolderName(buttonName)
+
+	if isValid, failureMessage = validateScreenPanelName(panelName); !isValid {
+		return
+	}
+
+	screenPackageFolderPath := filepath.Join(folderPaths.FrontendGUIScreens, screenPackageName)
 	var currentPanelNames []string
-	// This panel is to be added to a button panel group.
-	if !buttonHasPanelGroup {
-		failureMessage = fmt.Sprintf("The button named %q has tabs not panels.", buttonName)
-		return
-	}
-	// The panel name must be new to this button's panel group.
-	if currentPanelNames, err = PanelNames(buttonFolderPath); err != nil {
+	if currentPanelNames, err = PanelNames(screenPackageFolderPath); err != nil {
 		return
 	}
 	for _, currentPanelName := range currentPanelNames {
-		if currentPanelName == panelName {
+		if panelName == currentPanelName {
+			// this is a current panel name.
 			isValid = true
 			return
 		}
 	}
-	// Not a current button panel name.
-	failureMessage = fmt.Sprintf("The button named %q does not have a panel named %q", buttonName, panelName)
-	return
-}
-
-// ValidateNewTabPanelName validates a new panel name for a tab's panel group.
-func ValidateNewTabPanelName(
-	buttonName string,
-	tabName string,
-	panelName string,
-	folderPaths *FolderPaths,
-) (isValid bool, failureMessage string, err error) {
-
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("ValidateNewTabPanelName: %w", err)
-		}
-	}()
-
-	var buttonFolderPath string
-	if _, buttonFolderPath, err = ButtonFileFolderPaths(buttonName, folderPaths); err != nil {
-		return
-	}
-	buttonHasPanelGroup := filepath.Base(buttonFolderPath) == ButtonPanelGroupFolderName(buttonName)
-	// This panel is to be added to a tab bar panel group.
-	if buttonHasPanelGroup {
-		failureMessage = fmt.Sprintf("The button named %q has panels not tabs.", buttonName)
-		return
-	}
-	// The panel name must be new to this panel group.
-	tabPanelGroupFolderName := TabPanelGroupFolderName(tabName)
-	tabPanelGroupFolderPath := filepath.Join(buttonFolderPath, tabPanelGroupFolderName)
-	// The panel name must be new to this tab's panel group.
-	var currentPanelNames []string
-	if currentPanelNames, err = PanelNames(tabPanelGroupFolderPath); err != nil {
-		return
-	}
-	for _, currentPanelName := range currentPanelNames {
-		if currentPanelName == panelName {
-			failureMessage = fmt.Sprintf("The tab named %q already has a panel named %q", tabName, panelName)
-			return
-		}
-	}
-	// Not a current tab panel name.
-	isValid = true
-	return
-}
-
-// ValidateCurrentTabPanelName validates a new panel name for a tab's panel group.
-func ValidateCurrentTabPanelName(
-	buttonName string,
-	tabName string,
-	panelName string,
-	folderPaths *FolderPaths,
-) (isValid bool, failureMessage string, err error) {
-
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("ValidateCurrentTabPanelName: %w", err)
-		}
-	}()
-
-	var buttonFolderPath string
-	if _, buttonFolderPath, err = ButtonFileFolderPaths(buttonName, folderPaths); err != nil {
-		return
-	}
-	buttonHasPanelGroup := filepath.Base(buttonFolderPath) == ButtonPanelGroupFolderName(buttonName)
-	// This panel is to be added to a tab bar panel group.
-	if buttonHasPanelGroup {
-		failureMessage = fmt.Sprintf("The button named %q has panels not tabs.", buttonName)
-		return
-	}
-	// The panel name must be new to this panel group.
-	tabPanelGroupFolderName := TabPanelGroupFolderName(tabName)
-	tabPanelGroupFolderPath := filepath.Join(buttonFolderPath, tabPanelGroupFolderName)
-	// The panel name must be new to this tab's panel group.
-	var currentPanelNames []string
-	if currentPanelNames, err = PanelNames(tabPanelGroupFolderPath); err != nil {
-		return
-	}
-	for _, currentPanelName := range currentPanelNames {
-		if currentPanelName == panelName {
-			isValid = true
-			return
-		}
-	}
-	// Not a current tab panel name.
-	failureMessage = fmt.Sprintf("The tab named %q does not have a panel named %q.", tabName, panelName)
+	// This is not a current panel name.
+	log.Printf("currentPanelNames %#v", currentPanelNames)
+	failureMessage = fmt.Sprintf("The screen package %q does not have a panel named %q.", screenPackageName, panelName)
 	return
 }

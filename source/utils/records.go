@@ -6,36 +6,12 @@ import (
 	"strings"
 )
 
-const (
-	folderName = "storer"
-	goExt      = ".go"
-)
-
-var lExt = len(goExt)
-
-// RecordFileName returns the file name for a record.
-func RecordFileName(recordName string) (fileName string) {
-	fileName = DeCap(recordName) + ".go"
-	return
-}
-
-func UserRecordNames(folderPaths *FolderPaths) (recordNames []string, err error) {
+// RecordNames returns the name of each record.
+func RecordNames(folderPaths *FolderPaths) (recordNames []string, err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("utils.UserRecordNames: %w", err)
-		}
-	}()
-
-	recordNames, err = AllRecordNames(folderPaths)
-	return
-}
-
-func AllRecordNames(folderPaths *FolderPaths) (recordNames []string, err error) {
-
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("utils.AllRecordNames: %w", err)
+			err = fmt.Errorf("utils.RecordNames: %w", err)
 		}
 	}()
 
@@ -43,9 +19,10 @@ func AllRecordNames(folderPaths *FolderPaths) (recordNames []string, err error) 
 	if fileNames, err = FileNames(folderPaths.SharedStoreStorer); err != nil {
 		return
 	}
+	lExt := len(goFileExt)
 	for _, fileName := range fileNames {
 		ext := filepath.Ext(fileName)
-		if ext != goExt {
+		if ext != goFileExt {
 			continue
 		}
 		l := len(fileName) - lExt
@@ -69,12 +46,12 @@ func ValidateNewRecordName(
 
 	lc := strings.ToLower(recordName)
 
-	if isValid, userMessage = validateName(recordName); !isValid {
+	if isValid, userMessage = validateRecordName(recordName); !isValid {
 		return
 	}
 
 	var recordNames []string
-	if recordNames, err = AllRecordNames(folderPaths); err != nil {
+	if recordNames, err = RecordNames(folderPaths); err != nil {
 		return
 	}
 	for _, name := range recordNames {
@@ -100,12 +77,12 @@ func ValidateCurrentRecordName(
 		}
 	}()
 
-	if isValid, userMessage = validateName(recordName); !isValid {
+	if isValid, userMessage = validateRecordName(recordName); !isValid {
 		return
 	}
 
 	var recordNames []string
-	if recordNames, err = UserRecordNames(folderPaths); err != nil {
+	if recordNames, err = RecordNames(folderPaths); err != nil {
 		return
 	}
 	for _, name := range recordNames {

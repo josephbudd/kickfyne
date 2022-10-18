@@ -8,9 +8,9 @@ var chansTemplate = `package message
 
 type MSGer interface {
 	ID() (id uint64)
-	MSG() (msg interface{})
 	Name() (name string)
-	FatalError() (fatal bool, message string)
+	FatalError() (fatal bool, message, screenPackage string)
+	AsInterface() (msg interface{})
 }
 
 var FrontEndToBackEnd = make(chan MSGer, 255)

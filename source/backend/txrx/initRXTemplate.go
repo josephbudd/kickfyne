@@ -17,7 +17,7 @@ import (
 const initF = "initRX: %s"
 
 func init() {
-	addListener(message.InitID, initRX)
+	addReceiver(message.InitID, initRX)
 }
 
 func initRX(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {

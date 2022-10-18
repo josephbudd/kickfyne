@@ -7,9 +7,8 @@ import (
 )
 
 const (
-	usageCmdVerbNameF = "$ %s %s %s <record-name>"
+	usageCmdVerbNameF = "$ %s %s %s «record-name»"
 	usageCmdVerbF     = "$ %s %s %s"
-	instructionsF     = " (For %s instructions.)"
 )
 
 var (
@@ -23,37 +22,33 @@ func init() {
 	usageAdd = fmt.Sprintf(usageCmdVerbNameF, os.Args[0], Cmd, verbAdd)
 	usageRemove = fmt.Sprintf(usageCmdVerbNameF, os.Args[0], Cmd, verbRemove)
 	usageList = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbList)
-	usageHelp = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbHelp) + fmt.Sprintf(instructionsF, Cmd)
+	usageHelp = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbHelp)
 }
 
 func Usage() (usage string) {
-	lines := []string{
+	commands := []string{
 		usageAdd,
 		usageRemove,
 		usageList,
 		usageHelp,
 	}
-	commands := strings.Join(lines, "\n")
-	intro := `💾 RECORDS:
-When you create a record you also create it's store interface and implementation.
-Record definitions are at shared/store/record/.
-Record store interfaces are at shared/store/storer/.
-Record store implementations are at shared/store/storing/.
-A record name is upper camel case so a valid record name might be "Contact".
+	usage = `💾 RECORDS:
 
-You can add a record name with:     "$ kickfyne record add <record-name>"
-You can remove a record name with:  "$ kickfyne record remove <record-name>"
-You can list the record names with: "$ kickfyne record list"
-You can view this information with: "% kickfyne record help"
-
-After you add a record:
-  1. You will complete the record definition by adding your own custom elements.
-  2. You may also modify the record's store interface and implementation.
-     The records are by default, stored locally in easy to read yaml files.
-     You are free to change that by modifying a record's store interface and implementation. 
+When a record is added, the record's store interface and implementation are also added.
 
 MANAGING RECORDS AND STORES:
+` + strings.Join(commands, "\n") + `
+
+* Record definitions are at shared/store/record/.
+* Record store interfaces are at shared/store/storer/.
+* Record store implementations are at shared/store/storing/.
+* A record name is upper camel case so a valid record name might be "Contact".
+
+After a record is added:
+1. A search for KICKFYNE TODO will reveal instructions for proper developement and management of the record and store operation.
+   1. The record definition needs to be completed so that the message can contain useful information.
+   2. The record's store interface and implementation may need modification. The records are by default, stored locally in easy to read yaml files. If that is not how the application is to handle data then modifications can be made to a record's store interface and implementation.
+
 `
-	usage = intro + commands + "\n"
 	return
 }

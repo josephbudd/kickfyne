@@ -16,12 +16,14 @@ import (
 
 	"fyne.io/fyne/v2"
 
-	"{{ .ImportPrefix }}/frontend/panel/home"
+	"{{ .ImportPrefix }}/frontend/gui"
+	"{{ .ImportPrefix }}/frontend/gui/mainmenu"
+	"{{ .ImportPrefix }}/frontend/landingscreen"
 	"{{ .ImportPrefix }}/frontend/txrx"
 	"{{ .ImportPrefix }}/shared/message"
 )
 
-func Start(ctx context.Context, ctxCancel context.CancelFunc, a fyne.App, w fyne.Window) (err error) {
+func Start(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, window fyne.Window) (err error) {
 
 	defer func() {
 		if err != nil {
@@ -29,33 +31,28 @@ func Start(ctx context.Context, ctxCancel context.CancelFunc, a fyne.App, w fyne
 		}
 	}()
 
-	// Initialize the panel groups.
-	if err = home.Init(ctx, ctxCancel, a, w); err != nil {
+	// Initialize the view stack
+	gui.Init(window)
+
+	// Show the landing screen.
+	if err = landingscreen.Init(ctx, ctxCancelFunc, app, window); err != nil {
 		return
 	}
 
-	// Start communications with the back end.
-	// The listener will run as a concurrent process.
-	txrx.Listen(ctx, ctxCancel)
+	// Initialize main menu.
+	// The developer must ensure that all panel groups should get initialized from main menu.
+	if err = mainmenu.Init(ctx, ctxCancelFunc, app, window); err != nil {
+		return
+	}
+
+	// Start communications with the back-end.
+	// The receiver will run as a concurrent process.
+	txrx.StartReceiver(ctx, ctxCancelFunc)
 
 	// Send the init message.
-	// Let the back end know that the front end is ready.
-	// Parts of the front need data from the back end to build panel content.
+	// Let the back-end know that the front end is ready.
+	// Parts of the front need data from the back-end to build panel content.
 	message.FrontEndToBackEnd <- message.NewInit()
-	return
-}
-
-// Content builds and returns the view content.
-// One panelgroup at a time.
-func Content() (content *fyne.Container, err error) {
-
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("renderer.Content: %w", err)
-		}
-	}()
-
-	content, err = home.Content()
 	return
 }
 

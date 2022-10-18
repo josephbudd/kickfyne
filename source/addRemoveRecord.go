@@ -7,6 +7,7 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
+// RemoveRecord removes a record.
 func RemoveRecord(
 	recordName string,
 	importPrefix string,
@@ -24,6 +25,7 @@ func RemoveRecord(
 	return
 }
 
+// AddRecord adds a record.
 func AddRecord(
 	recordName string,
 	importPrefix string,

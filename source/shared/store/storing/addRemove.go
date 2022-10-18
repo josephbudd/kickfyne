@@ -8,6 +8,7 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
+// AddRecord adds a record storing file to shared/store/storing/.
 func AddRecord(
 	recordName string,
 	importPrefix string,
@@ -32,6 +33,7 @@ func AddRecord(
 	return
 }
 
+// RemoveRecord removes a record storing file from shared/store/storing/.
 func RemoveRecord(
 	recordName string,
 	folderPaths *utils.FolderPaths,

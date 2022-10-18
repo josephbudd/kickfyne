@@ -7,6 +7,7 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
+// RemoveMessage removes a message.
 func RemoveMessage(
 	messageName string,
 	folderPaths *utils.FolderPaths,
@@ -23,6 +24,7 @@ func RemoveMessage(
 	return
 }
 
+// AddMessage adds a message.
 func AddMessage(
 	messageName string,
 	folderPaths *utils.FolderPaths,

@@ -16,12 +16,6 @@ const (
 	chansMessageNameInvalid  = `The message name "Chans" is too much like the file name "chans.go" which belongs to the framework, defines message channels for the application and can not be removed.`
 )
 
-// MessageFileName returns the file name for a messsage.
-func MessageFileName(messageName string) (fileName string) {
-	fileName = DeCap(messageName) + ".go"
-	return
-}
-
 // UserMessageNames returns each of the user added message names.
 func UserMessageNames(folderPaths *FolderPaths) (names []string, err error) {
 	var allNames []string
@@ -65,7 +59,7 @@ func AllMessageNames(folderPaths *FolderPaths) (names []string, err error) {
 		return
 	}
 	names = make([]string, 0, len(dirEntrys))
-	lExt := len(goExt)
+	lExt := len(goFileExt)
 	for _, dirEntry := range dirEntrys {
 		if dirEntry.IsDir() {
 			// Ignore directories. (shouldn't be any)
@@ -74,7 +68,7 @@ func AllMessageNames(folderPaths *FolderPaths) (names []string, err error) {
 		}
 		fileName := dirEntry.Name()
 		ext := filepath.Ext(fileName)
-		if ext != goExt {
+		if ext != goFileExt {
 			continue
 		}
 		l := len(fileName) - lExt
@@ -82,7 +76,7 @@ func AllMessageNames(folderPaths *FolderPaths) (names []string, err error) {
 		if messageName == InitMessageName {
 			continue
 		}
-		if isValid, _ := validateName(messageName); !isValid {
+		if isValid, _ := validateMessageName(messageName); !isValid {
 			continue
 		}
 		names = append(names, messageName)
@@ -106,7 +100,7 @@ func ValidateNewMessageName(
 		userMessage = fmt.Sprintf(initMessageNameInvalidF, messageName)
 		return
 	default:
-		if isValid, userMessage = validateName(messageName); !isValid {
+		if isValid, userMessage = validateMessageName(messageName); !isValid {
 			return
 		}
 	}
@@ -146,7 +140,7 @@ func ValidateCurrentMessageName(
 		userMessage = chansMessageNameInvalid
 		return
 	default:
-		if isValid, userMessage = validateName(messageName); !isValid {
+		if isValid, userMessage = validateMessageName(messageName); !isValid {
 			return
 		}
 	}

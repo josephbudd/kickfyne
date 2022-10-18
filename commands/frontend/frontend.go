@@ -2,25 +2,28 @@ package frontend
 
 import (
 	"fmt"
-
-	"github.com/josephbudd/kickfyne/source/utils"
 )
 
 const (
-	Cmd          = "frontend"
-	SubCmdCreate = "create"
-	subCmdClear  = "clear"
-	SubCmdButton = "button"
-	SubCmdTab    = "tab"
-	SubCmdPanel  = "panel"
-	subCmdHelp   = "help"
-
-	verbAdd    = "add"
-	verbRemove = "remove"
-	verbList   = "list"
+	CmdPanel         = "panel"
+	CmdScreen        = "screen"
+	subCmdHelp       = "help"
+	subCmdLanding    = "update-landing"
+	verbAdd          = "add"
+	verbRemove       = "remove"
+	verbList         = "list"
+	verbAddAppTabs   = "add-apptabs"
+	verbAddDocTabs   = "add-doctabs"
+	verbAddAccordion = "add-accordion"
 )
 
-func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, importPrefix string, folderPaths *utils.FolderPaths) (err error) {
+// Handler passes control to the correct handlers.
+func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (err error) {
+
+	if !isBuilt || len(args) == 0 {
+		fmt.Println(Usage())
+		return
+	}
 
 	defer func() {
 		if err != nil {
@@ -28,25 +31,15 @@ func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, i
 		}
 	}()
 
-	if len(args) == 0 {
-		dumperCh <- "Missing a sub command."
-		dumperCh <- Usage()
-		return
-	}
 	switch args[0] {
-	case SubCmdCreate:
-		err = handleCreate(pathWD, dumperCh, args, isBuilt, importPrefix, folderPaths)
-	case subCmdClear:
-		err = handleClear(dumperCh, isBuilt, folderPaths)
-	case SubCmdButton:
-		err = handleButton(pathWD, dumperCh, args, isBuilt, importPrefix, folderPaths)
-	case SubCmdTab:
-		err = handleTab(pathWD, dumperCh, args, isBuilt, importPrefix, folderPaths)
-	case SubCmdPanel:
-		err = handlePanel(pathWD, dumperCh, args, isBuilt, importPrefix, folderPaths)
+	case CmdScreen:
+		err = handleScreen(pathWD, args, isBuilt, importPrefix)
+	case CmdPanel:
+		err = handlePanel(pathWD, args, isBuilt, importPrefix)
+	case subCmdHelp:
+		fmt.Println(Usage())
 	default:
-		dumperCh <- fmt.Sprintf("\nUnknown command %q.\n", args[0])
-		dumperCh <- Usage()
+		fmt.Println(Usage())
 	}
 	return
 }

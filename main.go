@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -27,49 +28,61 @@ func main() {
 		}
 	}()
 
-	go notify(ctx, ctxCancel)
-	dumperCh := startDumper(ctx)
-	defer func() {
-		dumperCh <- "EOJ\n"
-	}()
-
-	// doit(dumperCh)
-
 	var pathWD string
 	if pathWD, err = os.Getwd(); err != nil {
 		return
 	}
 
 	var isBuilt bool
-	var importPrefix string
-	var folderPaths *utils.FolderPaths
-	if isBuilt, importPrefix, folderPaths, err = utils.Setup(pathWD, dumperCh); err != nil {
+	if isBuilt, err = utils.IsBuilt(pathWD); err != nil {
 		return
 	}
-	// Build the args to pass on to the handlers.
-	var handlerArgs []string
-	lArgs := len(os.Args)
-	switch {
-	case lArgs < 2:
-		dumperCh <- help.Usage()
+	var importPrefix string
+	if importPrefix, err = utils.ImportPrefix(pathWD); err != nil {
+		fmt.Println("Failure: Unable to read a go.mod file.")
 		return
-	case lArgs > 2:
-		handlerArgs = os.Args[2:]
+	}
+	go notify(ctx, ctxCancel)
+	// Build the args to pass on to the handlers.
+	lArgs := len(os.Args)
+	if lArgs < 2 {
+		fmt.Println(help.Usage())
+		return
 	}
 
 	switch os.Args[1] {
 	case framework.Cmd:
-		err = framework.Handler(pathWD, dumperCh, handlerArgs, isBuilt, importPrefix, folderPaths)
-	case frontend.Cmd:
-		err = frontend.Handler(pathWD, dumperCh, handlerArgs, isBuilt, importPrefix, folderPaths)
+		var handlerArgs []string
+		if lArgs > 2 {
+			handlerArgs = os.Args[2:]
+		}
+		err = framework.Handler(pathWD, handlerArgs, isBuilt, importPrefix)
+	case frontend.CmdScreen, frontend.CmdPanel:
+		var handlerArgs []string
+		if lArgs > 2 {
+			handlerArgs = os.Args[1:]
+		}
+		err = frontend.Handler(pathWD, handlerArgs, isBuilt, importPrefix)
 	case help.Cmd:
-		err = help.Handler(pathWD, dumperCh, handlerArgs, isBuilt, importPrefix, folderPaths)
+		var handlerArgs []string
+		if lArgs > 2 {
+			handlerArgs = os.Args[2:]
+		}
+		err = help.Handler(handlerArgs)
 	case message.Cmd:
-		err = message.Handler(pathWD, dumperCh, handlerArgs, isBuilt, importPrefix, folderPaths)
+		var handlerArgs []string
+		if lArgs > 2 {
+			handlerArgs = os.Args[2:]
+		}
+		err = message.Handler(pathWD, handlerArgs, isBuilt, importPrefix)
 	case record.Cmd:
-		err = record.Handler(pathWD, dumperCh, handlerArgs, isBuilt, importPrefix, folderPaths)
+		var handlerArgs []string
+		if lArgs > 2 {
+			handlerArgs = os.Args[2:]
+		}
+		err = record.Handler(pathWD, handlerArgs, isBuilt, importPrefix)
 	default:
-		dumperCh <- help.Usage()
+		fmt.Println(help.Usage())
 	}
 }
 

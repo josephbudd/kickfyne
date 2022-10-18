@@ -11,10 +11,11 @@ var {{ .MessageName }}ID = NextID()
 type {{ .MessageName }} struct {
 	id      uint64
 	name    string
-	GroupID uint64 // both ways
+	ScreenPackage string // both ways
 
 	/* KICKFYNE TODO:
 	Complete this {{ .MessageName }} struct definition.
+	Add the members that you want this message to have.
 	*/
 
 	Error        bool   // to front
@@ -22,21 +23,21 @@ type {{ .MessageName }} struct {
 	ErrorMessage string // to front
 }
 
-// Build{{ .MessageName }} constructs a new New {{ .MessageName }} message.
-func Build{{ .MessageName }}(groupID uint64) (msg {{ .MessageName }}) {
-	msg = {{ .MessageName }}{
-		id:                  {{ .MessageName }}ID,
-		name:                "{{ .MessageName }}",
-		GroupID:             groupID,
+// New{{ .MessageName }} returns a *{{ .MessageName }} message.
+func New{{ .MessageName }}(screenPackage string) (msg *{{ .MessageName }}) {
+	msg = &{{ .MessageName }}{
+		id:            {{ .MessageName }}ID,
+		name:          "{{ .MessageName }}",
+		ScreenPackage: screenPackage,
 
 		/* KICKFYNE TODO:
-		Complete this {{ .MessageName }} constructor if needed.
+		Complete New{{ .MessageName }} as needed.
 		*/
 	}
 	return
 }
 
-// {{ .MessageName }} implements the MSGer interface with ID and MSG and FatalError.
+// {{ .MessageName }} implements the MSGer interface with ID and AsInterface and FatalError.
 
 // ID returns the message's id
 func (msg *{{ .MessageName }}) ID() (id uint64) {
@@ -44,22 +45,23 @@ func (msg *{{ .MessageName }}) ID() (id uint64) {
 	return
 }
 
-// Name returns the message's id
+// Name returns the message's Name.
 func (msg *{{ .MessageName }}) Name() (name string) {
 	name = msg.name
 	return
 }
 
-// Message returns the message's id
-func (msg *{{ .MessageName }}) MSG() (m interface{}) {
+// AsInterface returns the message as an interface{}.
+func (msg *{{ .MessageName }}) AsInterface() (m interface{}) {
 	m = msg
 	return
 }
 
-// IsFatal return if there was a fatal error and it's message.
-func (msg *{{ .MessageName }}) FatalError() (fatal bool, message string) {
+// FatalError return if there was a fatal error and it's message.
+func (msg *{{ .MessageName }}) FatalError() (fatal bool, message, screenPackage string) {
 	fatal = msg.Fatal
 	message = msg.ErrorMessage
+	screenPackage = msg.ScreenPackage
 	return
 }
 

@@ -1,17 +1,23 @@
 package store
 
+import "github.com/josephbudd/kickfyne/source/utils"
+
 const (
 	storesFileName   = "stores.go"
 	storesFolderName = "stores"
 )
 
 type storesTemplateData struct {
-	ImportPrefix           string
-	RecordNamesPadded      map[string]string
-	RecordNamesColonPadded map[string]string
+	ImportPrefix string
+	RecordNames  []string
+	Funcs        utils.Funcs
 }
 
-var storesTemplate = `{{ $DOT := . }}{{ $haveRecords := ne (len .RecordNamesPadded) 0 }}package store
+var storesTemplate = `{{ $DOT := . -}}
+{{ $haveRecords := ne (len .RecordNames) 0 -}}
+{{ $recordNamesPadded := call .Funcs.PadSlice .RecordNames -}}
+{{ $recordNamesColonPadded := call .Funcs.SuffixPadSlice .RecordNames ":" -}}
+package store
 
 import (
 	"fmt"
@@ -22,14 +28,18 @@ import (
 
 // Stores is each of the application's storers.
 type Stores struct {
-	// Local yaml stores. {{- range $name, $padded := .RecordNamesPadded }}
-	{{ $padded }} *storing.{{ $name }}Store{{ end }}
+	// Local yaml stores.
+{{- range $i, $padded := $recordNamesPadded }}
+	{{ $padded }} *storing.{{ index $DOT.RecordNames $i }}Store
+{{- end }}
 }
 
 // New constructs a new Stores.
 func New() (stores *Stores) {
-	stores = &Stores{ {{- range $name, $colonPadded := .RecordNamesColonPadded }}
-		{{ $colonPadded }} storing.New{{ $name }}Store(),{{ end }}
+	stores = &Stores{
+{{- range $i, $colonPadded := $recordNamesColonPadded }}
+		{{ $colonPadded }} storing.New{{ index $DOT.RecordNames $i }}Store(),
+{{- end }}
 	}
 	return
 }
@@ -44,12 +54,16 @@ func (stores *Stores) Open() (err error) {
 			msg := strings.Join(errList, "\n")
 			err = fmt.Errorf("stores.Open: %s", msg)
 		}
-	}(){{ if $haveRecords }}
+	}()
+{{- if $haveRecords }}
 
-	// Local yaml stores.{{ range $name, $colonPadded := .RecordNamesColonPadded }}
+	// Local yaml stores.
+ {{- range $name := .RecordNames }}
 	if err = stores.{{ $name }}.Open(); err != nil {
 		errList = append(errList, err.Error())
-	}{{ end }}{{ end }}
+	}
+ {{- end }}
+{{- end }}
 
 	return
 }
@@ -64,12 +78,16 @@ func (stores *Stores) Close() (err error) {
 			msg := strings.Join(errList, "\n")
 			err = fmt.Errorf("stores.Close: %s", msg)
 		}
-	}(){{ if $haveRecords }}
+	}()
+{{- if $haveRecords }}
 
-	// Local yaml stores. {{- range $name, $colonPadded := .RecordNamesColonPadded }}
+	// Local yaml stores.
+ {{- range $name := .RecordNames }}
 	if err = stores.{{ $name }}.Close(); err != nil {
 		errList = append(errList, err.Error())
-	}{{ end }}{{ end }}
+	}
+ {{- end }}
+{{- end }}
 
 	return
 }

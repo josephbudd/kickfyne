@@ -8,7 +8,7 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
-// AddMessageHandler adds a message handler to the back end txrx folder.
+// AddMessageHandler adds a message handler to the back-end txrx folder.
 func AddMessageHandler(
 	messageName string,
 	importPrefix string,
@@ -36,7 +36,7 @@ func AddMessageHandler(
 	return
 }
 
-// RemoveMessageHandler removes a message handler from the back end txrx folder.
+// RemoveMessageHandler removes a message handler from the back-end txrx folder.
 func RemoveMessageHandler(
 	messageName string,
 	folderPaths *utils.FolderPaths,

@@ -32,6 +32,7 @@ var (
 	appDataPath     string
 	appStoresPath   string
 	shareImagesPath string
+	metaDataPath    string
 )
 
 func Init() (err error) {
@@ -82,19 +83,29 @@ func Init() (err error) {
 	// Images folder.
 	pwd := os.Getenv("PWD")
 	shareImagesPath = filepath.Join(pwd, "images")
+
+	// Meta data.
+	metaDataPath = filepath.Join(pwd, "FyneApp.toml")
 	return
 }
 
-// StoreURI returns the allowed iri for the store file.
-func StoreURI(filename string) (fileURI fyne.URI) {
+// StoreURI returns the URI of the folder where records are stored by default.
+func StoreURI(filename string) (storeURI fyne.URI) {
 	path := filepath.Join(appStoresPath, filename)
-	fileURI = storage.NewFileURI(path)
+	storeURI = storage.NewFileURI(path)
 	return
 }
 
-func ImageURI(filename string) (fileURI fyne.URI) {
+// ImageURI returns the URI of the images folder.
+func ImageURI(filename string) (imageURI fyne.URI) {
 	path := filepath.Join(shareImagesPath, filename)
-	fileURI = storage.NewFileURI(path)
+	imageURI = storage.NewFileURI(path)
+	return
+}
+
+// MetaDataURI returns the URI of fyne's application meta data file.
+func MetaDataURI() (metaDataURI fyne.URI) {
+	metaDataURI = storage.NewFileURI(metaDataPath)
 	return
 }
 

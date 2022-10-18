@@ -7,95 +7,71 @@ import (
 )
 
 const (
-	newLine        = "\n"
-	newLineNewLine = "\n\n"
-	blankLine      = ""
-	commentF       = " (For instructions on how to %s.)"
-	commentSF      = " (For instructions on how to %s a %s.)"
-	commentPF      = " (For instructions on how to %s a %s.)"
+	newLine                = "\n"
+	screenPackageNameParam = "«screen-package-name»"
+	panelNameParam         = "«panel-name»"
 
-	usageCmdSubcmdVerbPathF     = "$ %s %s %s %s %s"
-	usageCmdSubcmdVerbNameF     = "$ %s %s %s %s %s"
-	usageCmdSubcmdVerbSubcmdF   = "$ %s %s %s %s %s"
-	usageCmdSubcmdVerb2NamesF   = "$ %s %s %s %s %s %s"
-	usageCmdSubcmdVerb3NamesF   = "$ %s %s %s %s %s %s %s"
-	usageCmdSubcmdPathF         = "$ %s %s %s %s"
-	usageCmdSubcmdVerbF         = "$ %s %s %s %s"
-	usageCmdSubcmdVerbThisHelpF = "$ %s %s %s %s (This help.)"
-	usageCmdSubcmdF             = "$ %s %s %s"
+	usage3F = "$ %s %s %s"
+	usage4F = "$ %s %s %s %s"
+	usage5F = "$ %s %s %s %s %s"
 )
 
 var (
-	UsageCreate        = fmt.Sprintf(usageCmdSubcmdPathF, os.Args[0], Cmd, SubCmdCreate, "<path to create-buttons-yaml-file>")
-	usageCreateHelp    = fmt.Sprintf(usageCmdSubcmdVerbF, os.Args[0], Cmd, SubCmdCreate, subCmdHelp) + fmt.Sprintf(commentF, SubCmdCreate)
-	usageClear         = fmt.Sprintf(usageCmdSubcmdF, os.Args[0], Cmd, subCmdClear)
-	UsageButtonAdd     = fmt.Sprintf(usageCmdSubcmdVerbPathF, os.Args[0], Cmd, SubCmdButton, verbAdd, "<path to add-button-yaml-file>")
-	usageButtonAddHelp = fmt.Sprintf(usageCmdSubcmdVerbSubcmdF, os.Args[0], Cmd, SubCmdButton, verbAdd, subCmdHelp) + fmt.Sprintf(commentSF, verbAdd, SubCmdButton)
-	usageButtonRemove  = fmt.Sprintf(usageCmdSubcmdVerbNameF, os.Args[0], Cmd, SubCmdButton, verbRemove, "<button-name>")
-	usageButtonList    = fmt.Sprintf(usageCmdSubcmdVerbF, os.Args[0], Cmd, SubCmdButton, verbList)
-	usageButtonHelp    = fmt.Sprintf(usageCmdSubcmdVerbThisHelpF, os.Args[0], Cmd, SubCmdButton, subCmdHelp)
-	UsageTabAdd        = fmt.Sprintf(usageCmdSubcmdVerbPathF, os.Args[0], Cmd, SubCmdTab, verbAdd, "<path to add-tab-yaml-file>")
-	usageTabAddHelp    = fmt.Sprintf(usageCmdSubcmdVerbSubcmdF, os.Args[0], Cmd, SubCmdTab, verbAdd, subCmdHelp) + fmt.Sprintf(commentSF, verbAdd, SubCmdTab)
-	usageTabRemove     = fmt.Sprintf(usageCmdSubcmdVerb2NamesF, os.Args[0], Cmd, SubCmdTab, verbRemove, "<buton-name>", "<tab-name>")
-	usageTabHelp       = fmt.Sprintf(usageCmdSubcmdVerbThisHelpF, os.Args[0], Cmd, SubCmdTab, subCmdHelp)
-	UsagePanelAdd      = fmt.Sprintf(usageCmdSubcmdVerbPathF, os.Args[0], Cmd, SubCmdPanel, verbAdd, "<path to add-panel-yaml-file>")
-	usagePanelAddHelp  = fmt.Sprintf(usageCmdSubcmdVerbSubcmdF, os.Args[0], Cmd, SubCmdPanel, verbAdd, subCmdHelp) + fmt.Sprintf(commentSF, verbAdd, SubCmdPanel)
-	UsagePanelRemove   = fmt.Sprintf(usageCmdSubcmdVerb3NamesF, os.Args[0], Cmd, SubCmdPanel, verbRemove, "<buton-name>", "[<tab-name>]", "<panel-name>")
-	usagePanelHelp     = fmt.Sprintf(usageCmdSubcmdVerbThisHelpF, os.Args[0], Cmd, SubCmdPanel, subCmdHelp)
+	UsageScreenAdd          = fmt.Sprintf(usage4F, os.Args[0], CmdScreen, verbAdd, screenPackageNameParam)
+	UsageScreenAddAccordion = fmt.Sprintf(usage4F, os.Args[0], CmdScreen, verbAddAccordion, screenPackageNameParam)
+	UsageScreenAddAppTabs   = fmt.Sprintf(usage4F, os.Args[0], CmdScreen, verbAddAppTabs, screenPackageNameParam)
+	UsageScreenAddDocTabs   = fmt.Sprintf(usage4F, os.Args[0], CmdScreen, verbAddDocTabs, screenPackageNameParam)
+	usageScreenHelp         = fmt.Sprintf(usage3F, os.Args[0], CmdScreen, subCmdHelp)
+	UsageScreenLanding      = fmt.Sprintf(usage3F, os.Args[0], CmdScreen, subCmdLanding)
+	usageScreenList         = fmt.Sprintf(usage3F, os.Args[0], CmdScreen, verbList)
+	UsageScreenRemove       = fmt.Sprintf(usage4F, os.Args[0], CmdScreen, verbRemove, screenPackageNameParam)
+
+	UsagePanelAdd    = fmt.Sprintf(usage5F, os.Args[0], CmdPanel, verbAdd, screenPackageNameParam, panelNameParam)
+	usagePanelHelp   = fmt.Sprintf(usage3F, os.Args[0], CmdPanel, subCmdHelp)
+	usagePanelList   = fmt.Sprintf(usage4F, os.Args[0], CmdPanel, verbList, screenPackageNameParam)
+	UsagePanelRemove = fmt.Sprintf(usage5F, os.Args[0], CmdPanel, verbRemove, screenPackageNameParam, panelNameParam)
 )
 
-func usageButton() (usage string) {
-	lines := []string{
-		UsageButtonAdd, usageButtonAddHelp, usageButtonRemove, usageButtonList, usageButtonHelp,
+func UsageScreen() (usage string) {
+	commands := []string{
+		UsageScreenAdd,
+		UsageScreenAddAccordion, UsageScreenAddAppTabs, UsageScreenAddDocTabs,
+		UsageScreenRemove,
+		usageScreenList,
+		UsageScreenLanding,
+		usageScreenHelp,
 	}
-	usage = newLine + strings.Join(lines, newLine)
+	usage = `📺 MANAGING SCREENS:
+` + strings.Join(commands, newLine) + `
+After a screen is added:
+1. A search for KICKFYNE TODO will reveal instructions for proper developement and management of the screen operation.
+`
 	return
 }
 
-func usageTab() (usage string) {
-	lines := []string{
-		UsageTabAdd, usageTabAddHelp, usageTabRemove, usageTabHelp,
+func UsagePanel() (usage string) {
+	commands := []string{
+		UsagePanelAdd,
+		UsagePanelRemove,
+		usagePanelList,
+		usagePanelHelp,
 	}
-	usage = newLine + strings.Join(lines, newLine)
-	return
-}
-
-func usagePanel() (usage string) {
-	lines := []string{
-		UsagePanelAdd, usagePanelAddHelp, UsagePanelRemove, usagePanelHelp,
-	}
-	usage = newLine + strings.Join(lines, newLine)
-	return
-}
-
-func usageCreateClear() (usage string) {
-	lines := []string{
-		UsageCreate, usageCreateHelp, usageClear,
-	}
-	usage = newLine + strings.Join(lines, newLine)
+	usage = `📊 MANAGING SCREEN PANELS:
+` + strings.Join(commands, newLine) + `
+After a panel is added:
+1. A search for KICKFYNE TODO will reveal instructions for proper developement and management of the panel operation.
+`
 	return
 }
 
 func Usage() (usage string) {
-	intro := `👀 THE FRONT END:
-The frontend is made with a single button-pad, tab-bars and panel-groups.
-* Button-Pad:
-  Your app begins with the home panel which is the button-pad. The button labels give the user a general idea of what he or she can do with the app.
-  When the user clicks a button, the view switches to the button's tab-bar panel or to the button's panel group.
-* Tab-bars:
-  In a tab-bar each tab has it's own panel group.
-* Panel-groups:
-  In a panel-group only one panel is visible at a time.
-  Each panel in a panel-group has it's own unique design and purpose that you control.
-  The framework gives each panel-group:
-    * it's own messenger which communicates with the back-end.
+	usage = `👀 THE front-end:
+The front-end's user interface is built with screen packages. A screen package is composed of panels and a messenger. The panels are how the screen package interacts with the user, displaying content and accepting user input. The messenger is how the screen package communicates with the back-end, sending and receiving messages.
 
-MANAGING THE FRONT END:
-`
-	usage = intro +
-		usageCreateClear() + newLine +
-		usageButton() + newLine +
-		usageTab() + newLine +
-		usagePanel() + newLine
+For example a screen might have a panel where the user selects a record to edit and then another panel for editing the record. Meanwhile the messenger is communicating with the back-end getting records for selection, a record for editing, and sending the edited record to the back-end for storage and switching panels.
+
+Alternately, the above screen with two panels could be done with two screens. One screen with only a select panel and the other screen with only an edit panel.
+
+` + UsageScreen() + newLine + UsagePanel()
 	return
 }

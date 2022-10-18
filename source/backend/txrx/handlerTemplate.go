@@ -21,7 +21,7 @@ import (
 const {{ $dCMessageName }}F = "{{ $dCMessageName }}RX: %s"
 
 func init() {
-	addListener(message.{{ .MessageName }}ID, {{ $dCMessageName }}RX)
+	addReceiver(message.{{ .MessageName }}ID, {{ $dCMessageName }}RX)
 }
 
 func {{ $dCMessageName }}RX(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {

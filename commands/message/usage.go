@@ -7,9 +7,8 @@ import (
 )
 
 const (
-	usageCmdVerbNameF = "$ %s %s %s <message-name>"
+	usageCmdVerbNameF = "$ %s %s %s «message-name»"
 	usageCmdVerbF     = "$ %s %s %s"
-	instructionsF     = " (For %s instructions.)"
 )
 
 var (
@@ -23,36 +22,31 @@ func init() {
 	usageAdd = fmt.Sprintf(usageCmdVerbNameF, os.Args[0], Cmd, verbAdd)
 	usageRemove = fmt.Sprintf(usageCmdVerbNameF, os.Args[0], Cmd, verbRemove)
 	usageList = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbList)
-	usageHelp = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbHelp) + fmt.Sprintf(instructionsF, Cmd)
+	usageHelp = fmt.Sprintf(usageCmdVerbF, os.Args[0], Cmd, verbHelp)
 }
 
 func Usage() (usage string) {
-	lines := []string{
+	commands := []string{
 		usageAdd,
 		usageRemove,
 		usageList,
 		usageHelp,
 	}
-	commands := strings.Join(lines, "\n")
-	intro := `💬 MESSAGES:
-The frontend and backend are separate go threads that communicate using messages.
-Message definitions are at "shared/message/".
-The backend message handlers are at "backend/txrx/"
-The frontend message handlers are in each panel-group's messenger.go file.
-A message name is upper camel case so a valid message name might be "AddContact".
-
-You can add a message name with:     "$ kickfyne message add <message-name>"
-You can remove a message name with:  "$ kickfyne message remove <message-name>"
-You can list the message names with: "$ kickfyne message list"
-You can view this information with:  "% kickfyne message help"
-
-After you add a message name you will:
-  1. Complete the message definition by adding your own custom elements to the default elements.
-  2. Complete the message's backend handler.
-  3. Add frontend message handlers to each panel-group-messenger that needs to handle the message.
+	usage = `💬 MESSAGES:
+The front-end and back-end are separate go threads that communicate using messages.
 
 MANAGING MESSAGES:
+` + strings.Join(commands, "\n") + `
+* Message definitions are at "shared/message/".
+* The back-end message handlers are at "backend/txrx/"
+* The front-end message handlers are in each screen's messageHandler.go file.
+* A message name is upper camel case so a valid message name might be "AddContact".
+
+After a message is added:
+1. A search for KICKFYNE TODO will reveal instructions for proper developement and management of the message and handler operation.
+   1. The message definition needs to be completed so that the message can contain useful information.
+   2. The message's back-end handler needs functionality added.
+2. Some front-end message handlers will need to handle sending and or receiving the message.
 `
-	usage = intro + commands + "\n"
 	return
 }

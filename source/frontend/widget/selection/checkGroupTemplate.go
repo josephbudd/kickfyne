@@ -1,7 +1,7 @@
 package selection
 
 const (
-	checkGrouopFileName = "CheckGroup.go"
+	checkGroupFileName = "checkGroup.go"
 )
 
 var checkGroupTemplate = `package selection

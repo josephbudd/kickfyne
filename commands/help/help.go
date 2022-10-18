@@ -6,15 +6,19 @@ import (
 	"github.com/josephbudd/kickfyne/commands/frontend"
 	"github.com/josephbudd/kickfyne/commands/message"
 	"github.com/josephbudd/kickfyne/commands/record"
-	"github.com/josephbudd/kickfyne/source/utils"
 )
 
 const (
-	Cmd         = "help"
-	usageSubCmd = "usage"
+	Cmd = "help"
 )
 
-func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, importPrefix string, folderPaths *utils.FolderPaths) (err error) {
+// Handler displays the requested help.
+func Handler(args []string) (err error) {
+
+	if len(args) == 0 {
+		fmt.Println(Usage())
+		return
+	}
 
 	defer func() {
 		if err != nil {
@@ -22,20 +26,15 @@ func Handler(pathWD string, dumperCh chan string, args []string, isBuilt bool, i
 		}
 	}()
 
-	if len(args) == 0 {
-		dumperCh <- Usage()
-		return
-	}
-
 	switch args[0] {
-	case frontend.Cmd:
-		dumperCh <- frontend.Usage()
+	case frontend.CmdScreen:
+		fmt.Println(frontend.UsageScreen())
+	case frontend.CmdPanel:
+		fmt.Println(frontend.UsagePanel())
 	case message.Cmd:
-		dumperCh <- message.Usage()
+		fmt.Println(message.Usage())
 	case record.Cmd:
-		dumperCh <- record.Usage()
-	case usageSubCmd:
-		dumperCh <- Usage()
+		fmt.Println(record.Usage())
 	default:
 		Usage()
 	}

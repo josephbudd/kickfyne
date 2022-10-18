@@ -1,10 +1,10 @@
 package selection
 
 const (
-	RadioGroupFileName = "RadioGroup.go"
+	radioGroupFileName = "radioGroup.go"
 )
 
-var RadioGroupTemplate = `package selection
+var radioGroupTemplate = `package selection
 
 import (
 	"fyne.io/fyne/v2"

@@ -26,30 +26,31 @@ func NewInit() (msg *Init) {
 	return
 }
 
-// Init implements the MSGer interface with ID and MSG.
+// Init implements the MSGer interface with ID and AsInterface.
 
-// ID returns the message's id
+// ID returns the message's id.
 func (msg *Init) ID() (id uint64) {
 	id = msg.id
 	return
 }
 
-// Name returns the message's id
+// Name returns the message's name.
 func (msg *Init) Name() (name string) {
 	name = msg.name
 	return
 }
 
-// Message returns the message's id
-func (msg *Init) MSG() (m interface{}) {
-	m = msg
+// FatalError returns if there was a fatal error and it's message.
+func (msg *Init) FatalError() (fatal bool, message, screenPackage string) {
+	fatal = msg.Fatal
+	message = msg.ErrorMessage
+	// Init has no screen package because its sent by the front-end not a screen.
 	return
 }
 
-// IsFatal return if there was a fatal error and it's message.
-func (msg *Init) FatalError() (fatal bool, message string) {
-	fatal = msg.Fatal
-	message = msg.ErrorMessage
+// AsInterface returns msg as an interface{}.
+func (msg *Init) AsInterface() (m interface{}) {
+	m = msg
 	return
 }
 

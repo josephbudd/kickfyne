@@ -50,6 +50,8 @@ func WriteFile(writePath string, content []byte) (err error) {
 	return
 }
 
+// CopyFile copies a file.
+// If the destination file exists it is written over.
 func CopyFile(srcPath, dstPath string) (err error) {
 
 	defer func() {
@@ -144,9 +146,9 @@ func FileNames(parentFolderPath string) (names []string, err error) {
 	return
 }
 
-// gotBuilt returns if the framework was built in this folder.
+// IsBuilt returns if the framework was built in this folder.
 // It does so by checking for 3 folders.
-func gotBuilt(appPath string) (isBuilt bool, err error) {
+func IsBuilt(appPath string) (isBuilt bool, err error) {
 
 	defer func() {
 		if err != nil {
@@ -156,22 +158,21 @@ func gotBuilt(appPath string) (isBuilt bool, err error) {
 
 	isBuilt, err = FolderHasFolders(
 		appPath,
-		FolderNameFrontend, FolderNameBackend, FolderNameShared,
+		folderNameFrontend, folderNameBackend, folderNameShared,
 	)
 	return
 }
 
-// Setup
-func Setup(pathWD string, dumperCh chan string) (isBuilt bool, importPrefix string, folderPaths *FolderPaths, err error) {
-	if isBuilt, err = gotBuilt(pathWD); err != nil {
-		return
-	}
+// ImportPrefix returns the importPrefix for the framework source code.
+func ImportPrefix(pathWD string) (importPrefix string, err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("utils.ImportPrefix: %w", err)
+		}
+	}()
+
 	// Get the import prefix from the go.mod file.
-	if importPrefix, err = gomod.Read(pathWD, dumperCh); err != nil {
-		return
-	}
-	if folderPaths, err = BuildFolderPaths(pathWD); err != nil {
-		return
-	}
+	importPrefix, err = gomod.Read(pathWD)
 	return
 }

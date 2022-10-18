@@ -6,6 +6,7 @@ import (
 
 	"github.com/josephbudd/kickfyne/source/backend"
 	"github.com/josephbudd/kickfyne/source/frontend"
+	"github.com/josephbudd/kickfyne/source/root"
 	"github.com/josephbudd/kickfyne/source/shared"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
@@ -34,8 +35,8 @@ func HasAppFolder(currentWP, appName string) (hasAppFolder bool, err error) {
 	return
 }
 
-// Build builds the framework in an appName folder in this parent folder.
-func Build(
+// CreateFramework builds the framework in an appName folder in this parent folder.
+func CreateFramework(
 	appName string,
 	importPrefix string,
 	folderPaths *utils.FolderPaths,
@@ -43,22 +44,27 @@ func Build(
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("source.Build: %w", err)
+			err = fmt.Errorf("source.CreateFramework: %w", err)
 		}
 	}()
 
+	// App folder.
+	if err = root.CreateFramework(appName, importPrefix, folderPaths); err != nil {
+		return
+	}
+
 	// Shared
-	if err = shared.BuildShared(appName, importPrefix, folderPaths); err != nil {
+	if err = shared.CreateFramework(appName, importPrefix, folderPaths); err != nil {
 		return
 	}
 
 	// Backend
-	if err = backend.Build(importPrefix, folderPaths); err != nil {
+	if err = backend.CreateFramework(importPrefix, folderPaths); err != nil {
 		return
 	}
 
 	// Frontend
-	if err = frontend.Build(importPrefix, folderPaths); err != nil {
+	if err = frontend.CreateFramework(importPrefix, folderPaths); err != nil {
 		return
 	}
 

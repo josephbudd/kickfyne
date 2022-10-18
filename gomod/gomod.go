@@ -12,7 +12,7 @@ const (
 	fileName = "go.mod"
 )
 
-func Read(pathWD string, dumperCh chan string) (module string, err error) {
+func Read(pathWD string) (module string, err error) {
 
 	defer func() {
 		if err != nil {
@@ -24,8 +24,8 @@ func Read(pathWD string, dumperCh chan string) (module string, err error) {
 	var content []byte
 	modGoPath := filepath.Join(pathWD, fileName)
 	if content, err = ioutil.ReadFile(modGoPath); err != nil {
-		dumperCh <- fmt.Sprintf("Unable to find a %q file.", fileName)
-		dumperCh <- `You need to run the command "go mod init" in this folder.`
+		fmt.Printf("Unable to find a %q file.\n", fileName)
+		fmt.Println(`You need to run the command "go mod init" in this folder.`)
 		return
 	}
 	lines := bytes.Split(content, []byte("\n"))
