@@ -16,7 +16,6 @@ import(
 
 	"fyne.io/fyne/v2"
 
-	"{{ .ImportPrefix }}/frontend/gui"
 	"{{ .ImportPrefix }}/frontend/landingscreen"
 	"{{ .ImportPrefix }}/shared/metadata"
 )
