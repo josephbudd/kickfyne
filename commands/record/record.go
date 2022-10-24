@@ -57,7 +57,13 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		if err = source.AddRecord(args[1], importPrefix, folderPaths); err != nil {
 			return
 		}
+		recordPath := utils.RecordFileRelativeFilePath(args[1])
+		recordStorerPath := utils.RecordStorerFileRelativeFilePath(args[1])
+		recordStoringPath := utils.RecordStoringFileRelativeFilePath(args[1])
 		fmt.Printf("Success. Record named %q added.\n", args[1])
+		fmt.Printf("KICKFYNE TODO: The record definition at %s may need some editing.\n", recordPath)
+		fmt.Printf("KICKFYNE TODO: The storer interface definition at %s may need some editing.\n", recordStorerPath)
+		fmt.Printf("KICKFYNE TODO: The storer interface implementation at %s may need some editing.\n", recordStoringPath)
 	case verbRemove:
 		if !isBuilt {
 			fmt.Println("The app must be initailized before a record can be removed.")

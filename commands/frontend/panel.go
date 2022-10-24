@@ -28,21 +28,6 @@ func handlePanel(pathWD string, args []string, isBuilt bool, importPrefix string
 	// args[0] is "panel"
 	// args[1] is the verb
 	switch args[1] {
-	case verbAddAccordion:
-		// args[0] is "panel"
-		// args[1] is "add-accordion"
-		// args[2] is the <screen-package-name>
-		err = handleAddAccordionPanel(pathWD, args[2], importPrefix)
-	case verbAddAppTabs:
-		// args[0] is "panel"
-		// args[1] is "add-apptabs"
-		// args[2] is the <screen-package-name>
-		err = handleAddAppTabsPanel(pathWD, args[2], importPrefix)
-	case verbAddDocTabs:
-		// args[0] is "panel"
-		// args[1] is "add-apptabs"
-		// args[2] is the <screen-package-name>
-		err = handleAddDocTabsPanel(pathWD, args[2], importPrefix)
 	case verbList:
 		// args[0] is "panel"
 		// args[1] is "list"
@@ -80,201 +65,6 @@ func handlePanel(pathWD string, args []string, isBuilt bool, importPrefix string
 	return
 }
 
-func handleAddAccordionPanel(pathWD, screenPackageName, importPrefix string) (err error) {
-
-	var failureMessage string
-	var successMessage string
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("frontend.handleAddAccordionPanel: %w", err)
-			return
-		}
-		switch {
-		case len(failureMessage) > 0:
-			fmt.Println("Failure:")
-			fmt.Println(failureMessage)
-		case len(successMessage) > 0:
-			fmt.Println("Success:")
-			fmt.Println(successMessage)
-		}
-	}()
-
-	var folderPaths *utils.FolderPaths
-	if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
-		return
-	}
-	// Validate the screen package name.
-	var isValid bool
-	if isValid, failureMessage, err = utils.ValidateCurrentScreenPackageName(screenPackageName, false, folderPaths); !isValid || err != nil {
-		return
-	}
-	// Make sure not an Accordion screen.
-	var hasFile bool
-	if hasFile, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an accordion panel file.", screenPackageName)
-		return
-	}
-	// Make sure not an AppTabs screen.
-	if hasFile, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an AppTabs panel file.", screenPackageName)
-		return
-	}
-	// Make sure not n DocTabs screen.
-	if hasFile, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has a DocTabs panel file.", screenPackageName)
-		return
-	}
-	// Add the panel file.
-	if err = screens.BuildAccordionPanelFile(
-		screenPackageName,
-		importPrefix,
-		folderPaths,
-	); err != nil {
-		return
-	}
-	successMessage = successMessagePanelAdd(screenPackageName, utils.AccordionPanelName)
-	return
-}
-
-func handleAddAppTabsPanel(pathWD, screenPackageName, importPrefix string) (err error) {
-
-	var failureMessage string
-	var successMessage string
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("frontend.handleAddAppTabsPanel: %w", err)
-			return
-		}
-		switch {
-		case len(failureMessage) > 0:
-			fmt.Println("Failure:")
-			fmt.Println(failureMessage)
-		case len(successMessage) > 0:
-			fmt.Println("Success:")
-			fmt.Println(successMessage)
-		}
-	}()
-
-	var folderPaths *utils.FolderPaths
-	if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
-		return
-	}
-	// Validate the screen package name.
-	var isValid bool
-	if isValid, failureMessage, err = utils.ValidateCurrentScreenPackageName(screenPackageName, false, folderPaths); !isValid || err != nil {
-		return
-	}
-	// Make sure not an Accordion screen.
-	var hasFile bool
-	if hasFile, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an accordion panel file.", screenPackageName)
-		return
-	}
-	// Make sure not an AppTabs screen.
-	if hasFile, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an AppTabs panel file.", screenPackageName)
-		return
-	}
-	// Make sure not n DocTabs screen.
-	if hasFile, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has a DocTabs panel file.", screenPackageName)
-		return
-	}
-	// Add the panel file.
-	if err = screens.BuildAppTabsPanelFile(
-		screenPackageName,
-		importPrefix,
-		folderPaths,
-	); err != nil {
-		return
-	}
-	successMessage = successMessagePanelAdd(screenPackageName, utils.AppTabsPanelName)
-	return
-}
-
-func handleAddDocTabsPanel(pathWD, screenPackageName, importPrefix string) (err error) {
-
-	var failureMessage string
-	var successMessage string
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("frontend.handleAddAppTabsPanel: %w", err)
-			return
-		}
-		switch {
-		case len(failureMessage) > 0:
-			fmt.Println("Failure:")
-			fmt.Println(failureMessage)
-		case len(successMessage) > 0:
-			fmt.Println("Success:")
-			fmt.Println(successMessage)
-		}
-	}()
-
-	var folderPaths *utils.FolderPaths
-	if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
-		return
-	}
-	// Validate the screen package name.
-	var isValid bool
-	if isValid, failureMessage, err = utils.ValidateCurrentScreenPackageName(screenPackageName, false, folderPaths); !isValid || err != nil {
-		return
-	}
-	// Make sure not an Accordion screen.
-	var hasFile bool
-	if hasFile, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an accordion panel file.", screenPackageName)
-		return
-	}
-	// Make sure not an AppTabs screen.
-	if hasFile, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has an AppTabs panel file.", screenPackageName)
-		return
-	}
-	// Make sure not na DocTabs screen.
-	if hasFile, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
-		return
-	}
-	if hasFile {
-		failureMessage = fmt.Sprintf("The screen package %q already has a DocTabs panel file.", screenPackageName)
-		return
-	}
-	// Add the panel file.
-	if err = screens.BuildDocTabsPanelFile(
-		screenPackageName,
-		importPrefix,
-		folderPaths,
-	); err != nil {
-		return
-	}
-	successMessage = successMessagePanelAdd(screenPackageName, utils.AppTabsPanelName)
-	return
-}
-
 func handlePanelAdd(pathWD, screenPackageName, screenPanelName, importPrefix string) (err error) {
 
 	var failureMessage string
@@ -308,21 +98,21 @@ func handlePanelAdd(pathWD, screenPackageName, screenPanelName, importPrefix str
 		return
 	}
 
-	// Make sure not an accordion screen.
-	var hasAccordionPanel bool
-	var hasAppTabsPanel bool
-	var hasDocTabsPanel bool
-	if hasAccordionPanel, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
+	// Determine the kind of screen.
+	var isAccordionScreen bool
+	var isAppTabScreen bool
+	var isDocTabScreen bool
+	if isAccordionScreen, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
 		return
 	}
-	if !hasAccordionPanel {
+	if !isAccordionScreen {
 		// Make sure not an AppTabs screen.
-		if hasAppTabsPanel, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
+		if isAppTabScreen, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
 			return
 		}
-		if !hasAppTabsPanel {
+		if !isAppTabScreen {
 			// Make sure not an DocTabs screen.
-			if hasDocTabsPanel, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
+			if isDocTabScreen, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
 				return
 			}
 		}
@@ -332,15 +122,15 @@ func handlePanelAdd(pathWD, screenPackageName, screenPanelName, importPrefix str
 	if err = screens.BuildPanelFile(
 		screenPackageName,
 		screenPanelName,
-		hasAccordionPanel,
-		hasAppTabsPanel,
-		hasDocTabsPanel,
+		isAccordionScreen,
+		isAppTabScreen,
+		isDocTabScreen,
 		importPrefix,
 		folderPaths,
 	); err != nil {
 		return
 	}
-	successMessage = successMessagePanelAdd(screenPackageName, screenPanelName)
+	successMessage = successMessagePanelAdd(screenPackageName, screenPanelName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }
 
@@ -378,29 +168,29 @@ func handlePanelRemove(pathWD, screenPackageName, screenPanelName, importPrefix 
 		return
 	}
 
-	// Make sure not an accordion screen.
-	var hasAccordionPanel bool
-	var hasAppTabsPanel bool
-	var hasDocTabsPanel bool
-	if hasAccordionPanel, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
+	// Get the screen type.
+	var isAccordionScreen bool
+	var isAppTabScreen bool
+	var isDocTabScreen bool
+	if isAccordionScreen, err = utils.ScreenHasAccordionPanel(folderPaths, screenPackageName); err != nil {
 		return
 	}
-	if !hasAccordionPanel {
+	if !isAccordionScreen {
 		// Make sure not an AppTabs screen.
-		if hasAppTabsPanel, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
+		if isAppTabScreen, err = utils.ScreenHasAppTabsPanel(folderPaths, screenPackageName); err != nil {
 			return
 		}
-		if !hasAppTabsPanel {
+		if !isAppTabScreen {
 			// Make sure not an DocTabs screen.
-			if hasDocTabsPanel, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
+			if isDocTabScreen, err = utils.ScreenHasDocTabsPanel(folderPaths, screenPackageName); err != nil {
 				return
 			}
 		}
 	}
-	if err = screens.RemovePanelFile(screenPackageName, screenPanelName, hasAccordionPanel, hasAppTabsPanel, hasDocTabsPanel, importPrefix, folderPaths); err != nil {
+	if err = screens.RemovePanelFile(screenPackageName, screenPanelName, isAccordionScreen, isAppTabScreen, isDocTabScreen, importPrefix, folderPaths); err != nil {
 		return
 	}
-	successMessage = successMessagePanelRemove(screenPackageName, screenPanelName)
+	successMessage = successMessagePanelRemove(screenPackageName, screenPanelName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }
 
@@ -446,20 +236,73 @@ func handlePanelList(pathWD, screenPackageName, importPrefix string) (err error)
 	return
 }
 
-func successMessagePanelAdd(screenPackageName, panelName string) (successMessage string) {
+func successMessagePanelAdd(screenPackageName, panelName string, isAccordionScreen, isAppTabScreen, isDocTabScreen bool) (successMessage string) {
+	panelFileRelativePath := utils.PanelFileRelativeFilePath(screenPackageName, panelName)
 	panelFileName := utils.PanelFileName(panelName)
-	panelRelativeFilePath := utils.PanelFileRelativeFilePath(screenPackageName, panelName)
-	screenRelativeFilePath := utils.ScreenFileRelativeFilePath(screenPackageName)
 	successMessage = fmt.Sprintf("Added the panel named %q to the screen package %q.", panelFileName, screenPackageName) +
-		"\n" +
-		fmt.Sprintf("KICKFYNE TODO: The panel file at %s may need some editing.\nKICKFYNE TODO: The screen file at %s may need some editing.\n", panelRelativeFilePath, screenRelativeFilePath)
+		fmt.Sprintf("\nKICKFYNE TODO: Edit the new panel file at %s.", panelFileRelativePath) +
+		defaultPanelEditingMessage(screenPackageName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }
 
-func successMessagePanelRemove(screenPackageName, panelName string) (successMessage string) {
-	screenRelativeFilePath := utils.ScreenFileRelativeFilePath(screenPackageName)
+func successMessagePanelRemove(screenPackageName, panelName string, isAccordionScreen, isAppTabScreen, isDocTabScreen bool) (successMessage string) {
 	successMessage = fmt.Sprintf("Removed the panel named %q from the screen package %q.", utils.AppTabsPanelFileName, screenPackageName) +
-		"\n" +
-		fmt.Sprintf("KICKFYNE TODO: The screen file at %s may need some editing.\n", screenRelativeFilePath)
+		defaultPanelEditingMessage(screenPackageName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
+	return
+}
+
+func defaultPanelEditingMessage(
+	screenPackageName string,
+	isAccordionScreen bool,
+	isAppTabScreen bool,
+	isDocTabScreen bool,
+) (successMessage string) {
+	var defaultPanelName string
+	var defaultPanelType string
+	switch {
+	case isAccordionScreen:
+		defaultPanelName = utils.AccordionPanelName
+		defaultPanelType = "Accordion"
+	case isAppTabScreen:
+		defaultPanelName = utils.AppTabsPanelName
+		defaultPanelType = "AppTabs"
+	case isDocTabScreen:
+		defaultPanelName = utils.DocTabsPanelName
+		defaultPanelType = "DocTabs"
+	default:
+		return
+	}
+	defaultPanelFileRelativePath := utils.PanelFileRelativeFilePath(screenPackageName, defaultPanelName)
+	successMessage = "\n" + fmt.Sprintf("KICKFYNE TODO: The %s panel file at %s may need some editing.", defaultPanelType, defaultPanelFileRelativePath)
+	return
+}
+
+func defaultPanelReviewMessage(
+	screenPackageName string,
+	isAccordionScreen bool,
+	isAppTabScreen bool,
+	isDocTabScreen bool,
+) (successMessage string) {
+	var defaultPanelName string
+	var defaultPanelType string
+	var funcName string
+	switch {
+	case isAccordionScreen:
+		defaultPanelName = utils.AccordionPanelName
+		defaultPanelType = "Accordion"
+		funcName = "accordionItems"
+	case isAppTabScreen:
+		defaultPanelName = utils.AppTabsPanelName
+		defaultPanelType = "AppTabs"
+		funcName = "tabItems"
+	case isDocTabScreen:
+		defaultPanelName = utils.DocTabsPanelName
+		defaultPanelType = "DocTabs"
+		funcName = "tabItems"
+	default:
+		return
+	}
+	defaultPanelFileRelativePath := utils.PanelFileRelativeFilePath(screenPackageName, defaultPanelName)
+	successMessage = "\n" + fmt.Sprintf("KICKFYNE TODO: You may want to review func %s in the %s panel file at %s.", funcName, defaultPanelType, defaultPanelFileRelativePath)
 	return
 }

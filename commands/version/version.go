@@ -7,8 +7,8 @@ import (
 
 const (
 	versionNewBreakingAPI  = 0
-	versionAPIAddedFeature = 4
-	versionAPIBugFix       = 1
+	versionAPIAddedFeature = 5
+	versionAPIBugFix       = 0
 )
 
 // V returns the version.

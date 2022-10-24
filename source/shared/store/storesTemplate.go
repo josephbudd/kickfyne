@@ -34,13 +34,20 @@ type Stores struct {
 {{- end }}
 }
 
+var _stores *Stores
+
 // New constructs a new Stores.
 func New() (stores *Stores) {
-	stores = &Stores{
+	if _stores != nil {
+		stores = _stores
+		return
+	}
+	_stores = &Stores{
 {{- range $i, $colonPadded := $recordNamesColonPadded }}
 		{{ $colonPadded }} storing.New{{ index $DOT.RecordNames $i }}Store(),
 {{- end }}
 	}
+	stores = _stores
 	return
 }
 

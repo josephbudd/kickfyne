@@ -42,28 +42,34 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 		}
 	}()
 
+	panel = &{{ .PanelName }}Components{
+		screen: screen,
+		screenWatchers: make(map[*container.TabItem]*gui.TabItemScreenCanvasObjectWatcher),
+	}
+
 	// Build the tabItems.
+	doctabs := container.NewDocTabs()
 	var tabItems []*container.TabItem
-	if tabItems, err = panel.tabItems(ctx, ctxCancel, app, w); err != nil {
+	if tabItems, err = panel.tabItems(screen.ctx, screen.ctxCancel, screen.app, screen.window, doctabs); err != nil {
 		return
 	}
 	// Build the DocTabs container.
-	apptabs := container.NewDocTabs(
-		tabItems...,
-	)
+	for _, tabItem := range tabItems {
+		doctabs.Append(tabItem)
+	}
 	// Build the panel content.
 	panel.content = container.New(
 		layout.NewMaxLayout(),
-		apptabs,
+		doctabs,
 	)
 	return
 }
 
-func (panel *{{ .PanelName }}Components) tabItems(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window) (items []*container.TabItem, err error) {
+func (panel *{{ .PanelName }}Components, doctabs *container.DocTabs) tabItems() (items []*container.TabItem, err error) {
 
 	defer func() {
 		if len(items) == 0 {
-			err = fmt.Errorf("The DocTabs in {{ .PackageName }}.{{ .PanelName }} must have items.")
+			err = fmt.Errorf("the DocTabs in {{ .PackageName }}.{{ .PanelName }} must have items")
 		}
 		if err != nil {
 			err = fmt.Errorf("panel.tabItems: %w", err)
@@ -91,7 +97,7 @@ func (panel *{{ .PanelName }}Components) tabItems(ctx context.Context, ctxCancel
 	// 2. Build and add the TabItem with the other screen's canvas object provider.
 	items = append(
 		items,
-		panel.addScreenWatcherItem("Other Screen", otherScreen),
+		panel.addScreenWatcherItem("Other Screen", otherScreen, doctabs),
 	)
 
 	*/
@@ -100,9 +106,9 @@ func (panel *{{ .PanelName }}Components) tabItems(ctx context.Context, ctxCancel
 }
 
 // addScreenWatcherItem creates and adds a TabItem with a canvas object provided by another screen.
-func (panel *{{ .PanelName }}Components) addScreenWatcherItem(label string, otherScreen gui.CanvasObjectProvider) (accordionItem *widget.AccordionItem) {
+func (panel *{{ .PanelName }}Components) addScreenWatcherItem(label string, otherScreen gui.CanvasObjectProvider) (tabItem *container.TabItem) {
 	var watcher *gui.TabItemScreenCanvasObjectWatcher
-	tabItem, watcher = gui.NewTabItemScreenCanvasObjectWatcher("Other Screen", otherScreen.CanvasObjectProvider())
+	tabItem, watcher = gui.NewTabItemScreenCanvasObjectWatcher(label, otherScreen)
 	panel.screenWatchers[tabItem] = watcher
 	return
 }

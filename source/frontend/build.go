@@ -7,7 +7,6 @@ import (
 	"github.com/josephbudd/kickfyne/source/frontend/gui"
 	"github.com/josephbudd/kickfyne/source/frontend/landingscreen"
 	"github.com/josephbudd/kickfyne/source/frontend/txrx"
-	"github.com/josephbudd/kickfyne/source/frontend/widget"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
@@ -42,11 +41,6 @@ func CreateFramework(
 
 	// frontend/gui/
 	if err = gui.CreateFramework(importPrefix, folderPaths); err != nil {
-		return
-	}
-
-	// frontend/widget/
-	if err = widget.CreateFramework(folderPaths); err != nil {
 		return
 	}
 

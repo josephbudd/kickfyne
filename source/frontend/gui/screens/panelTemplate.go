@@ -37,11 +37,11 @@ type {{ .PanelName }}Components struct {
 	*/
 }
 
-// new{{ call .Funcs.Cap .PanelName }} initializes this panel.
+// new{{ call .Funcs.Cap .PanelName }}Components initializes this panel.
 // It creates each component that makes up the panel.
 // It uses the components to create the panel content.
 // Returns the panel and the error.
-func new{{ call .Funcs.Cap .PanelName }}(screen *screenComponents) (panel *{{ .PanelName }}Components, err error) {
+func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (panel *{{ .PanelName }}Components, err error) {
 
 	defer func() {
 		if err != nil {
@@ -89,8 +89,8 @@ func new{{ call .Funcs.Cap .PanelName }}(screen *screenComponents) (panel *{{ .P
 }
 {{- if .AddShowFunc }}
 
-// Show shows this panel and hides the others.
-func (panel *{{ .PanelName }}Components) Show() {
+// show shows this panel and hides the others.
+func (panel *{{ .PanelName }}Components) show() {
 	panel.screen.canvasObjectProvider.UpdateCanvasObject(panel.content)
 }
 {{- end }}

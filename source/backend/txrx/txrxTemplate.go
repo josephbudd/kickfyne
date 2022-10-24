@@ -25,6 +25,11 @@ var (
 	messageReceivers = make(map[uint64][]Receiver, 20)
 )
 
+// Send sends a message to the front-end.
+func Send(msg message.MSGer) {
+	message.BackEndToFrontEnd <- msg
+}
+
 // addReceiver adds the number of receivers.
 func addReceiver(msgID uint64, receiver Receiver) (err error) {
 	if !message.IsValidID(msgID) {
@@ -34,7 +39,7 @@ func addReceiver(msgID uint64, receiver Receiver) (err error) {
 	var receivers []Receiver
 	var found bool
 	if receivers, found = messageReceivers[msgID]; !found {
-		receivers = make([]Receiver, 0, 20)
+		receivers = make([]Receiver, 0, 5)
 	}
 	receivers = append(receivers, receiver)
 	messageReceivers[msgID] = receivers
@@ -59,8 +64,8 @@ func StartReceiver(ctx context.Context, ctxCancel context.CancelFunc, stores *st
 					continue
 				}
 				realMSG := msg.AsInterface()
-				for _, l := range receivers {
-					go l(ctx, ctxCancel, stores, realMSG)
+				for _, f := range receivers {
+					go f(ctx, ctxCancel, stores, realMSG)
 				}
 			}
 		}

@@ -69,7 +69,7 @@ func (panel *{{ .PanelName }}Components) accordionItems(ctx context.Context, ctx
 
 	defer func() {
 		if len(items) == 0 {
-			err = fmt.Errorf("The Accordion in {{ .PackageName }}.{{ .PanelName }} must have items.")
+			err = fmt.Errorf("the Accordion in {{ .PackageName }}.{{ .PanelName }} must have items")
 		}
 		if err != nil {
 			err = fmt.Errorf("panel.accordionItems: %w", err)

@@ -20,7 +20,6 @@ import (
 	"{{ .ImportPrefix }}/frontend/gui/mainmenu"
 	"{{ .ImportPrefix }}/frontend/landingscreen"
 	"{{ .ImportPrefix }}/frontend/txrx"
-	"{{ .ImportPrefix }}/shared/message"
 )
 
 func Start(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, window fyne.Window) (err error) {
@@ -31,7 +30,7 @@ func Start(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, 
 		}
 	}()
 
-	// Initialize the view stack
+	// Initialize the view.
 	gui.Init(window)
 
 	// Show the landing screen.
@@ -48,11 +47,6 @@ func Start(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, 
 	// Start communications with the back-end.
 	// The receiver will run as a concurrent process.
 	txrx.StartReceiver(ctx, ctxCancelFunc)
-
-	// Send the init message.
-	// Let the back-end know that the front end is ready.
-	// Parts of the front need data from the back-end to build panel content.
-	message.FrontEndToBackEnd <- message.NewInit()
 	return
 }
 

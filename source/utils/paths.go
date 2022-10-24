@@ -15,10 +15,16 @@ const (
 	FolderNameLandingScreen = "landingscreen"
 	folderNameMainMenu      = "mainmenu"
 	FolderNameScreens       = "screens"
+	folderNameMessage       = "message"
+	folderNameStore         = "store"
+	folderNameStoring       = "storing"
+	folderNameStorer        = "storer"
+	folderNameRecord        = "record"
+	folderNameTXRX          = "txrx"
 )
 
 var (
-	backendTXRX = filepath.Join(folderNameBackend, "txrx")
+	backendTXRX = filepath.Join(folderNameBackend, folderNameTXRX)
 
 	frontendGUI              = filepath.Join(folderNameFrontend, folderNameGUI)
 	frontendGUIMainMenu      = filepath.Join(frontendGUI, folderNameMainMenu)
@@ -27,15 +33,15 @@ var (
 	frontendWidget           = filepath.Join(folderNameFrontend, "widget")
 	frontendWidgetSafeButton = filepath.Join(frontendWidget, "safebutton")
 	frontendWidgetSelection  = filepath.Join(frontendWidget, "selection")
-	frontendTXRX             = filepath.Join(folderNameFrontend, "txrx")
+	frontendTXRX             = filepath.Join(folderNameFrontend, folderNameTXRX)
 
-	sharedMessage      = filepath.Join(folderNameShared, "message")
+	sharedMessage      = filepath.Join(folderNameShared, folderNameMessage)
 	sharedMetaData     = filepath.Join(folderNameShared, "metadata")
 	sharedPaths        = filepath.Join(folderNameShared, "paths")
-	sharedStore        = filepath.Join(folderNameShared, "store")
-	sharedStoreRecord  = filepath.Join(sharedStore, "record")
-	sharedStoreStorer  = filepath.Join(sharedStore, "storer")
-	sharedStoreStoring = filepath.Join(sharedStore, "storing")
+	sharedStore        = filepath.Join(folderNameShared, folderNameStore)
+	sharedStoreRecord  = filepath.Join(sharedStore, folderNameRecord)
+	sharedStoreStorer  = filepath.Join(sharedStore, folderNameStorer)
+	sharedStoreStoring = filepath.Join(sharedStore, folderNameStoring)
 )
 
 type FolderPaths struct {

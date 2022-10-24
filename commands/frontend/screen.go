@@ -54,6 +54,12 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
 			return
 		}
+		fmt.Println(successMessageScreenAdd(
+			args[2],
+			false,
+			false,
+			false,
+		))
 	case verbAddAccordion:
 		// args[0] is "screen"
 		// args[1] is "add-accordion"
@@ -123,7 +129,9 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			return
 		}
 		screenDocComment := fmt.Sprintf("Package %s is an DocTabs package.\nKICKFYNE TODO: Correct this package doc commment.", args[2])
-		err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix)
+		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
+			return
+		}
 		var folderPaths *utils.FolderPaths
 		if folderPaths, err = utils.BuildFolderPaths(pathWD); err != nil {
 			return
@@ -214,19 +222,14 @@ func handleScreenLanding(pathWD, importPrefix string) (err error) {
 func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix string) (err error) {
 
 	var failureMessage string
-	var successMessage string
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("frontend.handleScreenAdd: %w", err)
 			return
 		}
-		switch {
-		case len(failureMessage) > 0:
+		if len(failureMessage) > 0 {
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
-		case len(successMessage) > 0:
-			fmt.Println("Success:")
-			fmt.Println(successMessage)
 		}
 	}()
 
@@ -248,12 +251,6 @@ func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix s
 	); err != nil {
 		return
 	}
-	successMessage = successMessageScreenAdd(
-		screenPackageName,
-		false,
-		false,
-		false,
-	)
 	return
 }
 
@@ -336,10 +333,29 @@ func handleScreenList(pathWD, importPrefix string) (err error) {
 	if screenNames, err = utils.ScreenPackageNames(folderPaths); err != nil {
 		return
 	}
+	// Get the panel names.
+	screenPanelNames := make(map[string][]string)
+	for _, screenName := range screenNames {
+		screenFolderPath := filepath.Join(folderPaths.FrontendGUIScreens, screenName)
+		if screenPanelNames[screenName], err = utils.PanelNames(screenFolderPath); err != nil {
+			return
+		}
+	}
 	// Display the list.
 	fmt.Printf("List of %d screen packages.\n", len(screenNames))
 	for i, screenName := range screenNames {
-		fmt.Printf("%d. %s\n", i+1, screenName)
+		panelNames := screenPanelNames[screenName]
+		lPanels := len(panelNames)
+		if lPanels == 0 {
+			fmt.Printf("% d. The %s screen has no panels.\n", i+1, screenName)
+			continue
+		}
+		// Display the panels
+		fmt.Printf("% d. %s: %s.\n", i+1, screenName, utils.ScreenFileRelativeFilePath(screenName))
+		// fmt.Printf("% d. %s: %sThe %s screen has %d panels.\n", i+1, screenName, lPanels)
+		for j, panelName := range panelNames {
+			fmt.Printf("    % d. %s: %s.\n", j+1, panelName, utils.PanelFileRelativeFilePath(screenName, panelName))
+		}
 	}
 
 	return
@@ -351,35 +367,20 @@ func successMessageScreenAdd(
 	isAppTabScreen bool,
 	isDocTabScreen bool,
 ) (successMessage string) {
-	var defaultPanelFileName string
-	var defaultPanelName string
 	var defaultPanelType string
 	switch {
 	case isAccordionScreen:
-		defaultPanelFileName = utils.AccordionPanelFileName
-		defaultPanelName = utils.AccordionPanelName
 		defaultPanelType = "Accordion"
 	case isAppTabScreen:
-		defaultPanelFileName = utils.AppTabsPanelFileName
-		defaultPanelName = utils.AppTabsPanelName
 		defaultPanelType = "AppTabs"
 	case isDocTabScreen:
-		defaultPanelFileName = utils.DocTabsPanelFileName
-		defaultPanelName = utils.DocTabsPanelName
 		defaultPanelType = "DocTabs"
 	default:
 		defaultPanelType = "generic"
 	}
-	screenRelativeFilePath := utils.ScreenFileRelativeFilePath(screenPackageName)
 	docRelativeFilePath := utils.DocFileRelativeFilePath(screenPackageName)
 	successMessage = fmt.Sprintf("Added the %s screen package named %q.", defaultPanelType, screenPackageName) +
-		"\n" +
-		fmt.Sprintf("KICKFYNE TODO: The screen file at %s may need some editing.", screenRelativeFilePath) +
-		"\n" +
-		fmt.Sprintf("KICKFYNE TODO: The doc file at %s may need some editing.", docRelativeFilePath)
-	if len(defaultPanelFileName) > 0 {
-		defaultPanelFileRelativePath := utils.PanelFileRelativeFilePath(screenPackageName, defaultPanelName)
-		successMessage += "\n" + fmt.Sprintf("KICKFYNE TODO: The %s panel file at %s may need some editing.", defaultPanelType, defaultPanelFileRelativePath)
-	}
+		fmt.Sprintf("\nKICKFYNE TODO: The doc file at %s may need some editing.", docRelativeFilePath) +
+		defaultPanelReviewMessage(screenPackageName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }

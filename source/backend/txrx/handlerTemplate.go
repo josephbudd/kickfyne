@@ -18,13 +18,13 @@ import (
 	"{{ .ImportPrefix }}/shared/store"
 )
 
-const {{ $dCMessageName }}F = "{{ $dCMessageName }}RX: %s"
+const {{ $dCMessageName }}F = "receive{{ .MessageName }}: %s"
 
 func init() {
-	addReceiver(message.{{ .MessageName }}ID, {{ $dCMessageName }}RX)
+	addReceiver(message.{{ .MessageName }}ID, receive{{ .MessageName }})
 }
 
-func {{ $dCMessageName }}RX(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {
+func receive{{ .MessageName }}(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {
 
 	{{ $dCMessageName }}Msg := msg.(*message.{{ .MessageName }})
 	var err, fatal error
@@ -33,14 +33,14 @@ func {{ $dCMessageName }}RX(ctx context.Context, ctxCancel context.CancelFunc, s
 		case fatal != nil:
 			{{ $dCMessageName }}Msg.Fatal = true
 			{{ $dCMessageName }}Msg.ErrorMessage = fmt.Sprintf({{ $dCMessageName }}F, fatal.Error())
-			message.BackEndToFrontEnd <- {{ $dCMessageName }}Msg
+			Send({{ $dCMessageName }}Msg)
 		case err != nil:
 			{{ $dCMessageName }}Msg.Error = true
 			{{ $dCMessageName }}Msg.ErrorMessage = fmt.Sprintf({{ $dCMessageName }}F, err.Error())
-			message.BackEndToFrontEnd <- {{ $dCMessageName }}Msg
+			Send({{ $dCMessageName }}Msg)
 		default:
 			// No errors so return the {{ $dCMessageName }}Msg.
-			message.BackEndToFrontEnd <- {{ $dCMessageName }}Msg
+			Send({{ $dCMessageName }}Msg)
 		}
 	}()
 

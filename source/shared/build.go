@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/josephbudd/kickfyne/source/shared/message"
 	"github.com/josephbudd/kickfyne/source/shared/metadata"
@@ -26,6 +27,15 @@ func CreateFramework(
 			err = fmt.Errorf("shared.CreateFramework: %w", err)
 		}
 	}()
+
+	// shared/shared.go
+	path := filepath.Join(folderPaths.Shared, sharedFileName)
+	data := sharedTemplateData{
+		ImportPrefix: importPrefix,
+	}
+	if err = utils.ProcessTemplate(sharedFileName, path, sharedTemplate, data); err != nil {
+		return
+	}
 
 	// shared/message/
 	if err = message.CreateFramework(folderPaths); err != nil {

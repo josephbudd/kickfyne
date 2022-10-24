@@ -33,9 +33,9 @@ func newMessageHandler(screen *screenComponents) (messenger *messageHandler) {
 	return
 }
 
-// PackageName returns this screen's package name.
+// ScreenPackage returns this screen's package name.
 // It is part of the txrx.Receiver interface implementation.
-func (m *messageHandler) PackageName() (name string) {
+func (m *messageHandler) ScreenPackage() (name string) {
 	name = packageName
 	return
 }
@@ -109,11 +109,11 @@ func (m *messageHandler) receiveGetSomething(msg *message.GetSomething) {
 			return
 		}
 		// This screen sent the message so receive the error here.
-		dialog.ShowInformation("Error", msg.ErrorMessage, window)
+		dialog.ShowInformation("Error", msg.ErrorMessage, m.screen.window)
 		return
 	}
-	editPanel.fillForm(msg.Something)
-	editPanel.show()
+	m.screen.panels.editPanel.FillForm(msg.Something)
+	m.screen.panels.editPanel.show()
 }
 
 // DoSomething message.
@@ -136,9 +136,9 @@ func (m *messageHandler) receiveDoSomething(msg *message.DoSomething) {
 		dialog.ShowInformation("Error", msg.ErrorMessage, window)
 		return
 	}
-	dialog.ShowInformation("Success", "Did something.", window)
+	dialog.ShowInformation("Success", "Did something.", m.screen.window)
 	// Go back to the select panel.
-	selectPanel.show()
+	m.screen.panels.selectPanel.show()
 }
 
 */

@@ -10,14 +10,19 @@ import (
 	"fyne.io/fyne/v2/container"
 )
 
+type TabSelector interface {
+	Select(*container.TabItem)
+}
+
 // TabItemScreenCanvasObjectWatcher implements ScreenCanvasWatcher.
 type TabItemScreenCanvasObjectWatcher struct {
 	tabItem              *container.TabItem
 	canvasObjectProvider CanvasObjectProvider
+	tabbar               TabSelector
 }
 
 // NewTabItemScreenCanvasObjectWatcher constructs a new TabItemScreenCanvasObjectWatcher.
-func NewTabItemScreenCanvasObjectWatcher(label string, canvasObjectProvider CanvasObjectProvider) (tabItem *container.TabItem, watcher *TabItemScreenCanvasObjectWatcher) {
+func NewTabItemScreenCanvasObjectWatcher(label string, canvasObjectProvider CanvasObjectProvider, tabbar TabSelector) (tabItem *container.TabItem, watcher *TabItemScreenCanvasObjectWatcher) {
 	tabItem = container.NewTabItem(
 		label,
 		canvasObjectProvider.CanvasObject(),
@@ -25,6 +30,7 @@ func NewTabItemScreenCanvasObjectWatcher(label string, canvasObjectProvider Canv
 	watcher = &TabItemScreenCanvasObjectWatcher{
 		tabItem:              tabItem,
 		canvasObjectProvider: canvasObjectProvider,
+		tabbar:               tabbar,
 	}
 	canvasObjectProvider.BindWatcher(watcher)
 	return
@@ -37,10 +43,8 @@ func (watcher *TabItemScreenCanvasObjectWatcher) Watch(canvasObjectProvider Canv
 	if canvasObject = canvasObjectProvider.CanvasObject(); canvasObject == nil {
 		return
 	}
-	if watcher.tabItem.Content == canvasObject {
-		return
-	}
 	watcher.tabItem.Content = canvasObject
+	watcher.tabbar.Select(watcher.tabItem)
 }
 
 // UnBind stop the watcher from watching.

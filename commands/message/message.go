@@ -62,7 +62,11 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		if err = txrx.AddMessageHandler(args[1], importPrefix, folderPaths); err != nil {
 			return
 		}
+		messageDefinitionPath := utils.MessageFileRelativeFilePath(args[1])
+		messageHandlerPath := utils.MessageHandlerFileRelativeFilePath(args[1])
 		fmt.Printf("Success. Message named %q added.\n", args[1])
+		fmt.Printf("KICKFYNE TODO: The message definition at %s may need some editing.\n", messageDefinitionPath)
+		fmt.Printf("KICKFYNE TODO: The back-end message handler at %s may need some editing.\n", messageHandlerPath)
 	case verbRemove:
 		if !isBuilt {
 			fmt.Println("The app must be initailized before a message can be removed.")

@@ -104,7 +104,7 @@ func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne
  {{- range $panelName := .PanelNames }}
   {{- if ne $panelName $DOT.DefaultPanelName }}
 	var {{ $panelName }} *{{ $panelName }}Components
-	if {{ $panelName }}, err = new{{ call $DOT.Funcs.Cap $panelName }}(newScreen); err != nil {
+	if {{ $panelName }}, err = new{{ call $DOT.Funcs.Cap $panelName }}Components(newScreen); err != nil {
 		return
 	}
 	newScreen.panels.{{ $panelName }} = {{ $panelName }}
@@ -112,7 +112,7 @@ func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne
  {{- end }}
  {{- if ne (len .DefaultPanelName) 0 }}
 	var {{ .DefaultPanelName }} *{{ .DefaultPanelName }}Components
-	if {{ .DefaultPanelName }}, err = new{{ call .Funcs.Cap .DefaultPanelName }}(newScreen); err != nil {
+	if {{ .DefaultPanelName }}, err = new{{ call .Funcs.Cap .DefaultPanelName }}Components(newScreen); err != nil {
 		return
 	}
 	newScreen.panels.{{ .DefaultPanelName }} = {{ .DefaultPanelName }}

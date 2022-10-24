@@ -29,7 +29,7 @@ This is the implementation of the {{ .RecordName }}Storer interface defined in {
 There fore, any changes made here must be reflected in {{ .StorerFilePath }}.
 */
 
-var {{ .RecordName }}FullErr = fmt.Errorf("{{ .RecordName }}Store is full.")
+var Err{{ .RecordName }}Full = fmt.Errorf("{{ .RecordName }}Store is full")
 
 type by{{ .RecordName }}ID []record.{{ .RecordName }}
 
@@ -76,17 +76,10 @@ func (store *{{ .RecordName }}Store) NextID() (nextID uint64, err error) {
 		}
 	}()
 
-
-	if store.IsFull() {
-		err = {{ .RecordName }}FullErr
-		return
-	}
-
 	store.lock.Lock()
 	defer store.lock.Unlock()
-	store.data.LastID++
-	nextID = store.data.LastID
 
+	nextID, err = store.nextID()
 	return
 }
 
@@ -205,7 +198,7 @@ func (store *{{ .RecordName }}Store) Update(newR record.{{ .RecordName }}) (upda
 	}
 	// New record.
 	if updatedR.ID == 0 {
-		if updatedR.ID, err = store.NextID(); err != nil {
+		if updatedR.ID, err = store.nextID(); err != nil {
 			return
 		}
 	}
@@ -240,7 +233,7 @@ func (store *{{ .RecordName }}Store) UpdateAll(newRR []record.{{ .RecordName }})
 		switch {
 		case updatedR.ID == 0:
 			// New record without an id.
-			if updatedR.ID, err = store.NextID(); err != nil {
+			if updatedR.ID, err = store.nextID(); err != nil {
 				return
 			}
 			store.data.Records = append(store.data.Records, updatedR)
@@ -374,6 +367,28 @@ func (store *{{ .RecordName }}Store) writeAll() (err error) {
 
 	// Write.
 	_, err = wc.Write(bb)
+	return
+}
+
+// nextID returns the next available id.
+// Returns the error if there are no more ids.
+func (store *{{ .RecordName }}Store) nextID() (nextID uint64, err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("{{ .RecordName }}Store.nextID: %w", err)
+		}
+	}()
+
+
+	if store.IsFull() {
+		err = Err{{ .RecordName }}Full
+		return
+	}
+
+	store.data.LastID++
+	nextID = store.data.LastID
+
 	return
 }
 

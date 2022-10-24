@@ -24,6 +24,8 @@ import (
 
 	"{{ .ImportPrefix }}/backend"
 	"{{ .ImportPrefix }}/frontend"
+	"{{ .ImportPrefix }}/shared"
+	"{{ .ImportPrefix }}/shared/message"
 )
 
 const (
@@ -61,8 +63,8 @@ func main() {
 	errCh := make(chan error, 2)
 	go monitor(w, ctx, ctxCancel, errCh)
 
-	// Start the back-end.
-	if err = backend.Start(ctx, ctxCancel, errCh); err != nil {
+	// Start shared.
+	if err = shared.Start(ctx, ctxCancel); err != nil {
 		return
 	}
 
@@ -75,6 +77,17 @@ func main() {
 	w.Resize(size)
 	w.CenterOnScreen()
 	w.Show()
+
+	// Start the back-end.
+	backend.Start(ctx, ctxCancel)
+
+	// Send the init message to the back-end letting it know that the front end is ready.
+	// See backend/txrx/init.go for details on 
+	// * completing any backend initializations.
+	// * sending messages to the front-end with data for the panels to display.
+	message.FrontEndToBackEnd <- message.NewInit()
+
+	// Start Fyne's event cycle.
 	a.Run()
 }
 
