@@ -44,7 +44,9 @@ func (watcher *TabItemScreenCanvasObjectWatcher) Watch(canvasObjectProvider Canv
 		return
 	}
 	watcher.tabItem.Content = canvasObject
-	watcher.tabbar.Select(watcher.tabItem)
+	if watcher.tabbar.Selected() == watcher.tabItem {
+		watcher.tabbar.Select(watcher.tabItem)
+	}
 }
 
 // UnBind stop the watcher from watching.
