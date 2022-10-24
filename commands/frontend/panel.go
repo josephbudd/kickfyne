@@ -231,22 +231,21 @@ func handlePanelList(pathWD, screenPackageName, importPrefix string) (err error)
 	// Display the list.
 	fmt.Printf("List of %d panels in the %q screen package.\n", len(panelNames), screenPackageName)
 	for i, panelName := range panelNames {
-		fmt.Printf("%d. %s\n", i+1, panelName)
+		fmt.Printf("    % d. %s: %s.\n", i+1, panelName, utils.PanelFileRelativeFilePath(screenPackageName, panelName))
 	}
 	return
 }
 
 func successMessagePanelAdd(screenPackageName, panelName string, isAccordionScreen, isAppTabScreen, isDocTabScreen bool) (successMessage string) {
 	panelFileRelativePath := utils.PanelFileRelativeFilePath(screenPackageName, panelName)
-	panelFileName := utils.PanelFileName(panelName)
-	successMessage = fmt.Sprintf("Added the panel named %q to the screen package %q.", panelFileName, screenPackageName) +
+	successMessage = fmt.Sprintf("Added the panel named %q to the screen package %q.", panelName, screenPackageName) +
 		fmt.Sprintf("\nKICKFYNE TODO: Edit the new panel file at %s.", panelFileRelativePath) +
 		defaultPanelEditingMessage(screenPackageName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }
 
 func successMessagePanelRemove(screenPackageName, panelName string, isAccordionScreen, isAppTabScreen, isDocTabScreen bool) (successMessage string) {
-	successMessage = fmt.Sprintf("Removed the panel named %q from the screen package %q.", utils.AppTabsPanelFileName, screenPackageName) +
+	successMessage = fmt.Sprintf("Removed the panel named %q from the screen package %q.", panelName, screenPackageName) +
 		defaultPanelEditingMessage(screenPackageName, isAccordionScreen, isAppTabScreen, isDocTabScreen)
 	return
 }
