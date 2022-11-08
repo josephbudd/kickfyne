@@ -64,8 +64,6 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 			return
 		}
 	}
-	fyneAppTOMLRelativeFilePath := utils.FyneAppTOMLRelativeFilePath()
-	fmt.Printf("KICKFYNE TODO: %s may need some editing.\n", fyneAppTOMLRelativeFilePath)
 	return
 }
 
@@ -98,5 +96,7 @@ func handleFramework(pathWD string, args []string, isBuilt bool, importPrefix st
 		return
 	}
 	fmt.Printf("Success. The framework is %s.\n", action)
+	fyneAppTOMLRelativeFilePath := utils.FyneAppTOMLRelativeFilePath()
+	fmt.Printf("KICKFYNE TODO: %s may need some editing.\n", fyneAppTOMLRelativeFilePath)
 	return
 }

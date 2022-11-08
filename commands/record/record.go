@@ -114,6 +114,12 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 			default:
 				fmt.Printf("  %d %s\n", j, recordName)
 			}
+			recordPath := utils.RecordFileRelativeFilePath(recordName)
+			fmt.Printf("      record definition: %s\n", recordPath)
+			recordStorerPath := utils.RecordStorerFileRelativeFilePath(recordName)
+			fmt.Printf("      storer definition: %s\n", recordStorerPath)
+			recordStoringPath := utils.RecordStoringFileRelativeFilePath(recordName)
+			fmt.Printf("      storer implementation: %s\n", recordStoringPath)
 		}
 	case verbHelp:
 		fmt.Println(Usage())

@@ -1,1 +1,19 @@
 after running panel add or panel remove "go mod init"
+
+package main
+
+import (
+    "fmt"
+    "reflect"
+    "unsafe"
+)
+
+func stringAddr(s string) uintptr {
+    return (*reflect.StringHeader)(unsafe.Pointer(&s)).Data
+}
+
+func main() {
+    fmt.Println(stringAddr("Hello"))
+    fmt.Println(stringAddr("Hello1"))
+    fmt.Println(stringAddr("Hello"))
+}

@@ -29,7 +29,7 @@ type {{ .PanelName }}Components struct {
 	screen  *screenComponents
 
 	/* KICKFYNE TODO:
-	Add other important components like labels, form inputs.
+	Add components that you will need to reference like widgets.
 
 	Example: A label.
 	label *widget.Label
@@ -54,7 +54,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 	}
 
 	/* KICKFYNE TODO:
-	Build the components that you added to the landingPanelComponents struct.
+	Build each component.
 
 	Example: A label.
 	panel.label = widget.NewLabel("Hello world")

@@ -115,12 +115,13 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		fmt.Printf("There are %d message names:\n", len(messageNames))
 		for i, messageName := range messageNames {
 			j := i + 1
-			switch {
-			case j < 10:
-				fmt.Printf("  %d  %s\n", j, messageName)
-			default:
-				fmt.Printf("  %d %s\n", j, messageName)
+			if j < 10 {
+				fmt.Printf("  %d   %s\n", j, messageName)
+			} else {
+				fmt.Printf(" % d  %s\n", j, messageName)
 			}
+			fmt.Printf("      definition: %s\n", utils.MessageFileRelativeFilePath(messageName))
+			fmt.Printf("      BE handler: %s\n", utils.MessageHandlerFileRelativeFilePath(messageName))
 		}
 	case verbHelp:
 		fmt.Println(Usage())

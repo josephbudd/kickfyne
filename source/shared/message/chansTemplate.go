@@ -15,7 +15,7 @@ type MSGer interface {
 
 var FrontEndToBackEnd = make(chan MSGer, 255)
 var BackEndToFrontEnd = make(chan MSGer, 255)
-var messageID uint64
+var messageID = uint64(1)
 
 func NextID() (id uint64) {
 	id = messageID
@@ -24,7 +24,7 @@ func NextID() (id uint64) {
 }
 
 func IsValidID(id uint64) (isvalid bool) {
-	isvalid = (id < messageID)
+	isvalid = (id > 0 && id < messageID)
 	return
 }
 

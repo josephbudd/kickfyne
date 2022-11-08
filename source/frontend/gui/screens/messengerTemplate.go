@@ -56,13 +56,11 @@ func (m *messageHandler) startReceiving() (err error) {
 	Use a message's ID.
 
 	Example:
-	if err = txrx.AddReceiver(
+	err = txrx.AddReceiver(
 		m,
 		message.GetSomethingID,
 		message.DoSomethingID,
-	); err != nil {
-		return
-	}
+	)
 
 	*/
 
@@ -95,8 +93,9 @@ Example:
 // GetSomething message.
 
 // sendGetSomething sends a GetSomething to the back-end.
-func (m *messageHandler) sendGetSomething(r *record.GetSomething) {
-	msg := message.HelloTX(packageName, r)
+func (m *messageHandler) sendGetSomething(id uint64) {
+	// ALWAYS USE THE MESSAGE CONSTRUCTOR.
+	msg := message.GetSomething(packageName, id)
 	txrx.Send(msg)
 }
 
@@ -120,9 +119,9 @@ func (m *messageHandler) receiveGetSomething(msg *message.GetSomething) {
 
 // sendDoSomething sends an DoSomething message to the back-end.
 func (m *messageHandler) sendDoSomething(r *record.ContactEdit) {
+	// ALWAYS USE THE MESSAGE CONSTRUCTOR.
 	msg := message.NewDoSomething(packageName, r)
 	txrx.Send(msg)
-
 }
 
 // receiveDoSomething handles a received DoSomething message from the back-end.

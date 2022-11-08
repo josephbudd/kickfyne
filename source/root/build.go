@@ -55,5 +55,15 @@ func CreateFramework(
 		return
 	}
 
+	// vscode workspaces
+	oPath = filepath.Join(folderPaths.App, backendWorkSpaceFileName)
+	if err = utils.ProcessTemplate(backendWorkSpaceFileName, oPath, backendWorkSpaceTemplate, nil); err != nil {
+		return
+	}
+	oPath = filepath.Join(folderPaths.App, frontendWorkSpaceFileName)
+	if err = utils.ProcessTemplate(frontendWorkSpaceFileName, oPath, frontendWorkSpaceTemplate, nil); err != nil {
+		return
+	}
+
 	return
 }
