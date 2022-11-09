@@ -24,7 +24,8 @@ const (
 )
 
 var (
-	backendTXRX = filepath.Join(folderNameBackend, folderNameTXRX)
+	backendStore = filepath.Join(folderNameBackend, folderNameStore)
+	backendTXRX  = filepath.Join(folderNameBackend, folderNameTXRX)
 
 	frontendGUI              = filepath.Join(folderNameFrontend, folderNameGUI)
 	frontendGUIMainMenu      = filepath.Join(frontendGUI, folderNameMainMenu)
@@ -45,9 +46,10 @@ var (
 )
 
 type FolderPaths struct {
-	App         string
-	Backend     string
-	BackendTXRX string
+	App          string
+	Backend      string
+	BackendStore string
+	BackendTXRX  string
 
 	Frontend                                                          string
 	FrontendGUI, FrontendGUIMainMenu, FrontendGUIScreens              string
@@ -74,8 +76,9 @@ func BuildFolderPaths(rootPath string) (folderPaths *FolderPaths, err error) {
 	folderPaths = &FolderPaths{
 		App: rootPath,
 
-		Backend:     filepath.Join(rootPath, folderNameBackend),
-		BackendTXRX: filepath.Join(rootPath, backendTXRX),
+		Backend:      filepath.Join(rootPath, folderNameBackend),
+		BackendStore: filepath.Join(rootPath, backendStore),
+		BackendTXRX:  filepath.Join(rootPath, backendTXRX),
 
 		Frontend:                 filepath.Join(rootPath, folderNameFrontend),
 		FrontendGUI:              filepath.Join(rootPath, frontendGUI),
@@ -133,6 +136,9 @@ func buildFolderPaths(folderPaths *FolderPaths) (err error) {
 
 	// Backend.
 	if err = os.Mkdir(folderPaths.Backend, DMode); err != nil {
+		return
+	}
+	if err = os.Mkdir(folderPaths.BackendStore, DMode); err != nil {
 		return
 	}
 	if err = os.Mkdir(folderPaths.BackendTXRX, DMode); err != nil {

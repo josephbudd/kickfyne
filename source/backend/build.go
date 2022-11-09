@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/josephbudd/kickfyne/source/backend/store"
 	"github.com/josephbudd/kickfyne/source/backend/txrx"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
@@ -30,6 +31,11 @@ func CreateFramework(
 		ImportPrefix: importPrefix,
 	}
 	if err = utils.ProcessTemplate(fileName, oPath, template, data); err != nil {
+		return
+	}
+
+	// backend/store/
+	if err = store.CreateFramework(importPrefix, folderPaths); err != nil {
 		return
 	}
 

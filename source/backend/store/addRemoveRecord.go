@@ -3,7 +3,8 @@ package store
 import (
 	"fmt"
 
-	"github.com/josephbudd/kickfyne/source/shared/store/record"
+	"github.com/josephbudd/kickfyne/source/backend/store/storer"
+	"github.com/josephbudd/kickfyne/source/backend/store/storing"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
@@ -20,9 +21,13 @@ func AddRecord(
 		}
 	}()
 
-	if err = record.AddRecord(recordName, folderPaths); err != nil {
+	if err = storer.AddRecord(recordName, importPrefix, folderPaths); err != nil {
 		return
 	}
+	if err = storing.AddRecord(recordName, importPrefix, folderPaths); err != nil {
+		return
+	}
+	err = rebuildStoresGo(importPrefix, folderPaths)
 	return
 }
 
@@ -39,8 +44,12 @@ func RemoveRecord(
 		}
 	}()
 
-	if err = record.RemoveRecord(recordName, folderPaths); err != nil {
+	if err = storer.RemoveRecord(recordName, folderPaths); err != nil {
 		return
 	}
+	if err = storing.RemoveRecord(recordName, folderPaths); err != nil {
+		return
+	}
+	err = rebuildStoresGo(importPrefix, folderPaths)
 	return
 }

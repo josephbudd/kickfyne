@@ -3,7 +3,8 @@ package source
 import (
 	"fmt"
 
-	"github.com/josephbudd/kickfyne/source/shared/store"
+	bestore "github.com/josephbudd/kickfyne/source/backend/store"
+	shstore "github.com/josephbudd/kickfyne/source/shared/store"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
@@ -20,7 +21,12 @@ func RemoveRecord(
 		}
 	}()
 
-	err = store.RemoveRecord(recordName, importPrefix, folderPaths)
+	if err = bestore.RemoveRecord(recordName, importPrefix, folderPaths); err != nil {
+		return
+	}
+	if err = shstore.RemoveRecord(recordName, importPrefix, folderPaths); err != nil {
+		return
+	}
 
 	return
 }
@@ -38,7 +44,12 @@ func AddRecord(
 		}
 	}()
 
-	err = store.AddRecord(recordName, importPrefix, folderPaths)
+	if err = bestore.AddRecord(recordName, importPrefix, folderPaths); err != nil {
+		return
+	}
+	if err = shstore.AddRecord(recordName, importPrefix, folderPaths); err != nil {
+		return
+	}
 
 	return
 }

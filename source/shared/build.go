@@ -7,7 +7,6 @@ import (
 	"github.com/josephbudd/kickfyne/source/shared/message"
 	"github.com/josephbudd/kickfyne/source/shared/metadata"
 	"github.com/josephbudd/kickfyne/source/shared/paths"
-	"github.com/josephbudd/kickfyne/source/shared/store"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
@@ -49,11 +48,6 @@ func CreateFramework(
 
 	// shared/paths/
 	if err = paths.CreateFramework(appName, folderPaths); err != nil {
-		return
-	}
-
-	// shared/store/
-	if err = store.CreateFramework(importPrefix, folderPaths); err != nil {
 		return
 	}
 

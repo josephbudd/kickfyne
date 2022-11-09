@@ -11,7 +11,8 @@ import (
 )
 
 type TabSelector interface {
-	Select(*container.TabItem)
+	Select(tabItem *container.TabItem)
+	Selected() (tabItem *container.TabItem)
 }
 
 // TabItemScreenCanvasObjectWatcher implements ScreenCanvasWatcher.

@@ -22,7 +22,7 @@ const (
 	DocTabsPanelFileName = "doctabsPanel.go"
 	DocTabsPanelName     = "doctabsPanel"
 
-	ralativeFilePathSuffix = ":1:1"
+	relativeFilePathSuffix = ":1:1"
 )
 
 // FyneAppTOMLFilePath
@@ -45,20 +45,20 @@ func PanelFileName(panelName string) (fileName string) {
 
 // PanelFileRelativeFilePath returns the relative path for a panel file.
 func PanelFileRelativeFilePath(screenPackageName, panelName string) (relativeFilePath string) {
-	fileName := panelName + goFileExt + ralativeFilePathSuffix
+	fileName := panelName + goFileExt + relativeFilePathSuffix
 	relativeFilePath = path.Join(folderNameFrontend, folderNameGUI, FolderNameScreens, screenPackageName, fileName)
 	return
 }
 
 // ScreenFileRelativeFilePath returns the relative path for a screen's screen.go file.
 func ScreenFileRelativeFilePath(screenPackageName string) (relativeFilePath string) {
-	relativeFilePath = path.Join(folderNameFrontend, folderNameGUI, FolderNameScreens, screenPackageName, ScreenFileName+ralativeFilePathSuffix)
+	relativeFilePath = path.Join(folderNameFrontend, folderNameGUI, FolderNameScreens, screenPackageName, ScreenFileName+relativeFilePathSuffix)
 	return
 }
 
 // DocFileRelativeFilePath returns the relative path for a screen's screen.go file.
 func DocFileRelativeFilePath(screenPackageName string) (relativeFilePath string) {
-	relativeFilePath = path.Join(folderNameFrontend, folderNameGUI, FolderNameScreens, screenPackageName, DocFileName+ralativeFilePathSuffix)
+	relativeFilePath = path.Join(folderNameFrontend, folderNameGUI, FolderNameScreens, screenPackageName, DocFileName+relativeFilePathSuffix)
 	return
 }
 
@@ -70,14 +70,14 @@ func MessageFileName(messageName string) (fileName string) {
 
 // MessageFileRelativeFilePath returns the relative path for a message file.
 func MessageFileRelativeFilePath(messageName string) (relativeFilePath string) {
-	fName := MessageFileName(messageName) + ralativeFilePathSuffix
+	fName := MessageFileName(messageName) + relativeFilePathSuffix
 	relativeFilePath = path.Join(folderNameShared, folderNameMessage, fName)
 	return
 }
 
 // MessageHandlerFileRelativeFilePath returns the relative path for a message file.
 func MessageHandlerFileRelativeFilePath(messageName string) (relativeFilePath string) {
-	fName := MessageFileName(messageName) + ralativeFilePathSuffix
+	fName := MessageFileName(messageName) + relativeFilePathSuffix
 	relativeFilePath = path.Join(folderNameBackend, folderNameTXRX, fName)
 	return
 }
@@ -90,21 +90,21 @@ func RecordFileName(recordName string) (fileName string) {
 
 // RecordFileRelativeFilePath returns the relative path for a record file.
 func RecordFileRelativeFilePath(recordName string) (relativeFilePath string) {
-	fName := MessageFileName(recordName) + ralativeFilePathSuffix
+	fName := MessageFileName(recordName) + relativeFilePathSuffix
 	relativeFilePath = path.Join(folderNameShared, folderNameStore, folderNameRecord, fName)
 	return
 }
 
 // RecordStorerFileRelativeFilePath returns the relative path for a record's storer file.
 func RecordStorerFileRelativeFilePath(recordName string) (relativeFilePath string) {
-	fName := MessageFileName(recordName) + ralativeFilePathSuffix
-	relativeFilePath = path.Join(folderNameShared, folderNameStore, folderNameStorer, fName)
+	fName := MessageFileName(recordName) + relativeFilePathSuffix
+	relativeFilePath = path.Join(folderNameBackend, folderNameStore, folderNameStorer, fName)
 	return
 }
 
 // RecordStoringFileRelativeFilePath returns the relative path for a record's storer file.
 func RecordStoringFileRelativeFilePath(recordName string) (relativeFilePath string) {
-	fName := MessageFileName(recordName) + ralativeFilePathSuffix
-	relativeFilePath = path.Join(folderNameShared, folderNameStore, folderNameStoring, fName)
+	fName := MessageFileName(recordName) + relativeFilePathSuffix
+	relativeFilePath = path.Join(folderNameBackend, folderNameStore, folderNameStoring, fName)
 	return
 }
