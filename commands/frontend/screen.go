@@ -10,10 +10,16 @@ import (
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
+var noErr = fmt.Errorf("noErr")
+
 // handleScreen passes control to the correct handlers.
 func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix string) (err error) {
 
 	defer func() {
+		if err == noErr {
+			err = nil
+			return
+		}
 		if err != nil {
 			err = fmt.Errorf("frontend.handlePanel: %w", err)
 		}
@@ -184,6 +190,7 @@ func handleScreenLanding(pathWD, importPrefix string) (err error) {
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
+			err = noErr
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)
@@ -230,6 +237,7 @@ func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix s
 		if len(failureMessage) > 0 {
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
+			err = noErr
 		}
 	}()
 
@@ -268,6 +276,7 @@ func handleScreenRemove(pathWD, screenPackageName, importPrefix string) (err err
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
+			err = noErr
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)
@@ -318,6 +327,7 @@ func handleScreenList(pathWD, importPrefix string) (err error) {
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
+			err = noErr
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)
