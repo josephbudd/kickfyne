@@ -1,4 +1,4 @@
-package metadata
+package meta
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func CreateFramework(
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("metadata.CreateFramework: %w", err)
+			err = fmt.Errorf("meta.CreateFramework: %w", err)
 		}
 	}()
 

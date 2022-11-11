@@ -15,7 +15,7 @@ import (
 	"fmt"
 
 	"{{ .ImportPrefix }}/shared/message"
-	"{{ .ImportPrefix }}/shared/store"
+	"{{ .ImportPrefix }}/backend/store"
 )
 
 const {{ $dCMessageName }}F = "receive{{ .MessageName }}: %s"

@@ -9,7 +9,7 @@ type templateData struct {
 var template = `package storer
 
 import (
-	"{{ .ImportPrefix }}/shared/store/record"
+	"{{ .ImportPrefix }}/shared/record"
 )
 
 /* KICKFYNE NOTE WELL:

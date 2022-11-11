@@ -7,6 +7,7 @@ import (
 )
 
 // RecordNames returns the name of each record.
+// It uses the file names in backend/store/storer/.
 func RecordNames(folderPaths *FolderPaths) (recordNames []string, err error) {
 
 	defer func() {
@@ -16,7 +17,7 @@ func RecordNames(folderPaths *FolderPaths) (recordNames []string, err error) {
 	}()
 
 	var fileNames []string
-	if fileNames, err = FileNames(folderPaths.SharedStoreStorer); err != nil {
+	if fileNames, err = FileNames(folderPaths.BackendStoreStorer); err != nil {
 		return
 	}
 	lExt := len(goFileExt)

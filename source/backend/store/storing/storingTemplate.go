@@ -1,9 +1,12 @@
 package storing
 
+import "github.com/josephbudd/kickfyne/source/utils"
+
 type templateData struct {
 	ImportPrefix   string
 	RecordName     string
 	StorerFilePath string
+	Funcs          utils.Funcs
 }
 
 var template = `package storing
@@ -19,8 +22,8 @@ import (
 	"fyne.io/fyne/v2/storage"
 	"gopkg.in/yaml.v3"
 
-	"{{ .ImportPrefix }}/shared/paths"
-	"{{ .ImportPrefix }}/shared/store/record"
+	"{{ .ImportPrefix }}/backend/folder"
+	"{{ .ImportPrefix }}/shared/record"
 )
 
 
@@ -53,9 +56,20 @@ type {{ .RecordName }}Store struct {
 // New{{ .RecordName }}Store constructs a new {{ .RecordName }}Store.
 // Param db is an open bolt data-store.
 // Returns a pointer to the new {{ .RecordName }}Store.
-func New{{ .RecordName }}Store() (store *{{ .RecordName }}Store) {
+func New{{ .RecordName }}Store() (store *{{ .RecordName }}Store, err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("NewCourseStore: %w", err)
+		}
+	}()
+
+	var {{ call .Funcs.DeCap .RecordName }}StoreURI fyne.URI
+	if {{ call .Funcs.DeCap .RecordName }}StoreURI, err = folder.FileURI("{{ .RecordName }}.yaml"); err != nil {
+		return
+	}
 	store = &{{ .RecordName }}Store{
-		uri: paths.StoreURI("{{ .RecordName }}.yaml"),
+		uri: {{ call .Funcs.DeCap .RecordName }}StoreURI,
 	}
 	return
 }

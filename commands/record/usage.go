@@ -39,9 +39,9 @@ When a record is added, the record's store interface and implementation are also
 MANAGING RECORDS AND STORES:
 ` + strings.Join(commands, "\n") + `
 
-* Record definitions are at shared/store/record/.
-* Record store interfaces are at shared/store/storer/.
-* Record store implementations are at shared/store/storing/.
+* Record definitions are at shared/record/.
+* Record store interfaces are at backend/store/storer/.
+* Record store implementations are at backend/store/storing/.
 * A record name is upper camel case so a valid record name might be "Contact".
 
 After a record is added:

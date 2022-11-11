@@ -29,7 +29,7 @@ func Init(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, w
 
 	defer func() {
 		if landingScreenErr != nil {
-			landingScreenErr = fmt.Errorf("landingscreen.SetLanding: %w", landingScreenErr)
+			landingScreenErr = fmt.Errorf("landingscreen.Init: %w", landingScreenErr)
 		}
 		err = landingScreenErr
 	}()

@@ -22,12 +22,13 @@ func AddRecord(
 	}()
 
 	fName := utils.RecordFileName(recordName)
-	oPath := filepath.Join(folderPaths.SharedStoreStoring, fName)
-	storerFilePath := filepath.Join(folderPaths.SharedStoreStorer, fName)
+	oPath := filepath.Join(folderPaths.BackendStoreStoring, fName)
+	storerFilePath := filepath.Join(folderPaths.BackendStoreStorer, fName)
 	data := templateData{
 		RecordName:     recordName,
 		ImportPrefix:   importPrefix,
 		StorerFilePath: storerFilePath,
+		Funcs:          utils.GetFuncs(),
 	}
 	err = utils.ProcessTemplate(fName, oPath, template, data)
 	return
@@ -46,7 +47,7 @@ func RemoveRecord(
 	}()
 
 	fName := utils.RecordFileName(recordName)
-	oPath := filepath.Join(folderPaths.SharedStoreStoring, fName)
+	oPath := filepath.Join(folderPaths.BackendStoreStoring, fName)
 	err = os.Remove(oPath)
 	return
 }

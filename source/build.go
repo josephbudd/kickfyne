@@ -59,7 +59,7 @@ func CreateFramework(
 	}
 
 	// Backend
-	if err = backend.CreateFramework(importPrefix, folderPaths); err != nil {
+	if err = backend.CreateFramework(appName, importPrefix, folderPaths); err != nil {
 		return
 	}
 

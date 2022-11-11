@@ -16,7 +16,7 @@ import (
 	"log"
 
 	"{{ .ImportPrefix }}/shared/message"
-	"{{ .ImportPrefix }}/shared/store"
+	"{{ .ImportPrefix }}/backend/store"
 )
 
 type Receiver func(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{})

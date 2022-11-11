@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"{{ .ImportPrefix }}/shared/message"
-	"{{ .ImportPrefix }}/shared/store"
+	"{{ .ImportPrefix }}/backend/store"
 )
 
 const initF = "receiveInit: %s"

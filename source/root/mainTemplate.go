@@ -23,14 +23,13 @@ import (
 	"fyne.io/fyne/v2/app"
 
 	"{{ .ImportPrefix }}/backend"
+	"{{ .ImportPrefix }}/backend/store"
 	"{{ .ImportPrefix }}/frontend"
-	"{{ .ImportPrefix }}/shared"
 	"{{ .ImportPrefix }}/shared/message"
 )
 
-const (
-	envTrue  = "1"
-	envFalse = ""
+var (
+	stores *store.Stores
 )
 
 func main() {
@@ -49,8 +48,6 @@ func main() {
 	if len(os.Getenv("FYNE_THEME")) == 0 {
 		os.Setenv("FYNE_THEME", "dark")
 	}
-	os.Setenv("USETESTPATH", envFalse)
-	os.Setenv("CWT_TESTING", envFalse)
 
 	a := app.New()
 	w := a.NewWindow("{{ .AppName }}")
@@ -61,12 +58,7 @@ func main() {
 		ctxCancel,
 	)
 	errCh := make(chan error, 2)
-	go monitor(w, ctx, ctxCancel, errCh)
-
-	// Start shared.
-	if err = shared.Start(ctx, ctxCancel); err != nil {
-		return
-	}
+	go waitAndClose(w, ctx, ctxCancel, errCh)
 
 	// Start the front end.
 	if err = frontend.Start(ctx, ctxCancel, a, w); err != nil {
@@ -79,7 +71,11 @@ func main() {
 	w.Show()
 
 	// Start the back-end.
-	backend.Start(ctx, ctxCancel)
+	// backend.Start also opens and returns the stores.
+	// func waitAndClose will close the stores when the app ends.
+	if stores, err = backend.Start(ctx, ctxCancel); err != nil {
+		return
+	}
 
 	// Send the init message to the back-end letting it know that the front end is ready.
 	// See backend/txrx/init.go for details on 
@@ -91,16 +87,32 @@ func main() {
 	a.Run()
 }
 
-func monitor(w fyne.Window, ctx context.Context, ctxCancel context.CancelFunc, errCh chan error) {
+// waitAndClose waits for the context to end and then closes down.
+func waitAndClose(w fyne.Window, ctx context.Context, ctxCancel context.CancelFunc, errCh chan error) {
+
+	var err error
+	var clErr error
+	defer func() {
+		var level int
+		if err != nil {
+			level++
+			log.Println(err)
+		}
+		if clErr != nil {
+			level++
+			log.Println(clErr)
+		}
+		os.Exit(level)
+	}()
+
 	select {
 	case <-ctx.Done():
 		w.Close()
-		os.Exit(0)
+		clErr = stores.Close()
 		return
-	case err := <-errCh:
-		log.Println(err)
+	case err = <-errCh:
 		w.Close()
-		os.Exit(1)
+		clErr = stores.Close()
 		return
 	}
 }

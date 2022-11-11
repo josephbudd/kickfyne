@@ -1,4 +1,4 @@
-package paths
+package folder
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func CreateFramework(
 	}()
 
 	// paths/paths.go
-	oPath := filepath.Join(folderPaths.SharedPaths, fileName)
+	oPath := filepath.Join(folderPaths.BackendPaths, fileName)
 	data := templateData{
 		AppName: appName,
 		Funcs:   utils.GetFuncs(),

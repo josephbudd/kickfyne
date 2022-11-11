@@ -3,8 +3,7 @@ package store
 import "github.com/josephbudd/kickfyne/source/utils"
 
 const (
-	storesFileName   = "stores.go"
-	storesFolderName = "stores"
+	storesFileName = "stores.go"
 )
 
 type storesTemplateData struct {
@@ -21,9 +20,17 @@ package store
 
 import (
 	"fmt"
-	"strings"{{ if $haveRecords }}
+	"log"
+	"strings"
+{{- if $haveRecords }}
 
-	"{{ .ImportPrefix }}/shared/store/storing"{{ end }}
+	"{{ .ImportPrefix }}/backend/store/storing"
+{{- end }}
+)
+
+var (
+	_stores   *Stores
+	storesErr error
 )
 
 // Stores is each of the application's storers.
@@ -34,17 +41,32 @@ type Stores struct {
 {{- end }}
 }
 
-var _stores *Stores
-
 // New constructs a new Stores.
-func New() (stores *Stores) {
-	if _stores != nil {
-		stores = _stores
+func New() (stores *Stores, err error) {
+
+	if err = storesErr; err != nil {
 		return
 	}
+	if stores = _stores; stores != nil {
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("store.New: %w", err)
+			storesErr = err
+		}
+	}()
+
+{{- range $recordName := .RecordNames }}
+	var {{ call $DOT.Funcs.DeCap $recordName }}Store *storing.{{ $recordName }}Store
+	if {{ call $DOT.Funcs.DeCap $recordName }}Store, err = storing.New{{ $recordName }}Store(); err != nil {
+		return
+	}
+{{- end }}
 	_stores = &Stores{
 {{- range $i, $colonPadded := $recordNamesColonPadded }}
-		{{ $colonPadded }} storing.New{{ index $DOT.RecordNames $i }}Store(),
+		{{ $colonPadded }} {{ call $DOT.Funcs.DeCap (index $DOT.RecordNames $i) }}Store,
 {{- end }}
 	}
 	stores = _stores
@@ -55,11 +77,16 @@ func New() (stores *Stores) {
 // It returns all of the errors as one single error.
 func (stores *Stores) Open() (err error) {
 
+	if err = storesErr; err != nil {
+		return
+	}
+
 	errList := make([]string, 0, 10)
 	defer func() {
 		if len(errList) > 0 {
 			msg := strings.Join(errList, "\n")
 			err = fmt.Errorf("stores.Open: %s", msg)
+			storesErr = err
 		}
 	}()
 {{- if $haveRecords }}
@@ -77,7 +104,13 @@ func (stores *Stores) Open() (err error) {
 
 // Close closes every store.
 // It returns all of the errors as one single error.
+// stores.Close is called by main.waitAndClose when the app shuts down.
 func (stores *Stores) Close() (err error) {
+	log.Println("closing stores")
+
+	if err = storesErr; err != nil {
+		return
+	}
 
 	errList := make([]string, 0, 4)
 	defer func() {

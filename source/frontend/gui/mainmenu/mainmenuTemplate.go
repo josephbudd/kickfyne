@@ -17,7 +17,7 @@ import(
 	"fyne.io/fyne/v2"
 
 	"{{ .ImportPrefix }}/frontend/landingscreen"
-	"{{ .ImportPrefix }}/shared/metadata"
+	"{{ .ImportPrefix }}/shared/meta"
 )
 
 // Init builds the main menu and adds it to the app.
@@ -36,13 +36,12 @@ func Init(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, w
 	}
 
 	// Build the menu.
-	var data fyne.AppMetadata
-	if data, err = metadata.AppMetaData(); err != nil {
+	var data meta.AppData
+	if data, err = meta.Data(); err != nil {
 		return
 	}
-
 	menu := fyne.NewMenu(
-		data.Name,
+		data.Details.Name,
 		items...,
 	)
 	mainmenu := fyne.NewMainMenu(menu)

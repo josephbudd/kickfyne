@@ -40,7 +40,7 @@ func createStoresGo(
 	}()
 
 	// store/stores.go
-	oPath := filepath.Join(folderPaths.SharedStore, storesFileName)
+	oPath := filepath.Join(folderPaths.BackendStore, storesFileName)
 	data := storesTemplateData{
 		ImportPrefix: importPrefix,
 		RecordNames:  []string{},
@@ -71,7 +71,7 @@ func rebuildStoresGo(
 	}
 
 	// store/stores.go
-	oPath := filepath.Join(folderPaths.SharedStore, storesFileName)
+	oPath := filepath.Join(folderPaths.BackendStore, storesFileName)
 	data := storesTemplateData{
 		ImportPrefix: importPrefix,
 		RecordNames:  recordNames,

@@ -24,44 +24,39 @@ const (
 )
 
 var (
-	backendStore = filepath.Join(folderNameBackend, folderNameStore)
-	backendTXRX  = filepath.Join(folderNameBackend, folderNameTXRX)
+	backendPaths        = filepath.Join(folderNameBackend, "folder")
+	backendStore        = filepath.Join(folderNameBackend, folderNameStore)
+	backendStoreStorer  = filepath.Join(backendStore, folderNameStorer)
+	backendStoreStoring = filepath.Join(backendStore, folderNameStoring)
+	backendTXRX         = filepath.Join(folderNameBackend, folderNameTXRX)
 
-	frontendGUI              = filepath.Join(folderNameFrontend, folderNameGUI)
-	frontendGUIMainMenu      = filepath.Join(frontendGUI, folderNameMainMenu)
-	frontendGUIScreens       = filepath.Join(frontendGUI, FolderNameScreens)
-	frontendLanding          = filepath.Join(folderNameFrontend, FolderNameLandingScreen)
-	frontendWidget           = filepath.Join(folderNameFrontend, "widget")
-	frontendWidgetSafeButton = filepath.Join(frontendWidget, "safebutton")
-	frontendWidgetSelection  = filepath.Join(frontendWidget, "selection")
-	frontendTXRX             = filepath.Join(folderNameFrontend, folderNameTXRX)
+	frontendGUI         = filepath.Join(folderNameFrontend, folderNameGUI)
+	frontendGUIMainMenu = filepath.Join(frontendGUI, folderNameMainMenu)
+	frontendGUIScreens  = filepath.Join(frontendGUI, FolderNameScreens)
+	frontendLanding     = filepath.Join(folderNameFrontend, FolderNameLandingScreen)
+	frontendTXRX        = filepath.Join(folderNameFrontend, folderNameTXRX)
 
-	sharedMessage      = filepath.Join(folderNameShared, folderNameMessage)
-	sharedMetaData     = filepath.Join(folderNameShared, "metadata")
-	sharedPaths        = filepath.Join(folderNameShared, "paths")
-	sharedStore        = filepath.Join(folderNameShared, folderNameStore)
-	sharedStoreRecord  = filepath.Join(sharedStore, folderNameRecord)
-	sharedStoreStorer  = filepath.Join(sharedStore, folderNameStorer)
-	sharedStoreStoring = filepath.Join(sharedStore, folderNameStoring)
+	sharedMessage     = filepath.Join(folderNameShared, folderNameMessage)
+	sharedMetaData    = filepath.Join(folderNameShared, "meta")
+	sharedStoreRecord = filepath.Join(folderNameShared, folderNameRecord)
 )
 
 type FolderPaths struct {
-	App          string
-	Backend      string
-	BackendStore string
-	BackendTXRX  string
+	App                                                   string
+	Backend                                               string
+	BackendPaths                                          string
+	BackendStore, BackendStoreStorer, BackendStoreStoring string
+	BackendTXRX                                           string
 
-	Frontend                                                          string
-	FrontendGUI, FrontendGUIMainMenu, FrontendGUIScreens              string
-	FrontendLanding                                                   string
-	FrontendWidget, FrontendWidgetSafeButton, FrontendWidgetSelection string
-	FrontendTXRX                                                      string
+	Frontend                                             string
+	FrontendGUI, FrontendGUIMainMenu, FrontendGUIScreens string
+	FrontendLanding                                      string
+	FrontendTXRX                                         string
 
-	Shared                                                                string
-	SharedMessage                                                         string
-	SharedMetaData                                                        string
-	SharedPaths                                                           string
-	SharedStore, SharedStoreRecord, SharedStoreStorer, SharedStoreStoring string
+	Shared                         string
+	SharedMessage                  string
+	SharedMetaData                 string
+	SharedStore, SharedStoreRecord string
 }
 
 // BuildFolderPaths constructs paths and then makes them on the disk.
@@ -76,28 +71,24 @@ func BuildFolderPaths(rootPath string) (folderPaths *FolderPaths, err error) {
 	folderPaths = &FolderPaths{
 		App: rootPath,
 
-		Backend:      filepath.Join(rootPath, folderNameBackend),
-		BackendStore: filepath.Join(rootPath, backendStore),
-		BackendTXRX:  filepath.Join(rootPath, backendTXRX),
+		Backend:             filepath.Join(rootPath, folderNameBackend),
+		BackendPaths:        filepath.Join(rootPath, backendPaths),
+		BackendStore:        filepath.Join(rootPath, backendStore),
+		BackendStoreStorer:  filepath.Join(rootPath, backendStoreStorer),
+		BackendStoreStoring: filepath.Join(rootPath, backendStoreStoring),
+		BackendTXRX:         filepath.Join(rootPath, backendTXRX),
 
-		Frontend:                 filepath.Join(rootPath, folderNameFrontend),
-		FrontendGUI:              filepath.Join(rootPath, frontendGUI),
-		FrontendGUIMainMenu:      filepath.Join(rootPath, frontendGUIMainMenu),
-		FrontendGUIScreens:       filepath.Join(rootPath, frontendGUIScreens),
-		FrontendLanding:          filepath.Join(rootPath, frontendLanding),
-		FrontendWidget:           filepath.Join(rootPath, frontendWidget),
-		FrontendWidgetSafeButton: filepath.Join(rootPath, frontendWidgetSafeButton),
-		FrontendWidgetSelection:  filepath.Join(rootPath, frontendWidgetSelection),
-		FrontendTXRX:             filepath.Join(rootPath, frontendTXRX),
+		Frontend:            filepath.Join(rootPath, folderNameFrontend),
+		FrontendGUI:         filepath.Join(rootPath, frontendGUI),
+		FrontendGUIMainMenu: filepath.Join(rootPath, frontendGUIMainMenu),
+		FrontendGUIScreens:  filepath.Join(rootPath, frontendGUIScreens),
+		FrontendLanding:     filepath.Join(rootPath, frontendLanding),
+		FrontendTXRX:        filepath.Join(rootPath, frontendTXRX),
 
-		Shared:             filepath.Join(rootPath, folderNameShared),
-		SharedMessage:      filepath.Join(rootPath, sharedMessage),
-		SharedMetaData:     filepath.Join(rootPath, sharedMetaData),
-		SharedPaths:        filepath.Join(rootPath, sharedPaths),
-		SharedStore:        filepath.Join(rootPath, sharedStore),
-		SharedStoreRecord:  filepath.Join(rootPath, sharedStoreRecord),
-		SharedStoreStorer:  filepath.Join(rootPath, sharedStoreStorer),
-		SharedStoreStoring: filepath.Join(rootPath, sharedStoreStoring),
+		Shared:            filepath.Join(rootPath, folderNameShared),
+		SharedMessage:     filepath.Join(rootPath, sharedMessage),
+		SharedMetaData:    filepath.Join(rootPath, sharedMetaData),
+		SharedStoreRecord: filepath.Join(rootPath, sharedStoreRecord),
 	}
 	err = buildFolderPaths(folderPaths)
 	return
@@ -138,7 +129,16 @@ func buildFolderPaths(folderPaths *FolderPaths) (err error) {
 	if err = os.Mkdir(folderPaths.Backend, DMode); err != nil {
 		return
 	}
+	if err = os.Mkdir(folderPaths.BackendPaths, DMode); err != nil {
+		return
+	}
 	if err = os.Mkdir(folderPaths.BackendStore, DMode); err != nil {
+		return
+	}
+	if err = os.Mkdir(folderPaths.BackendStoreStorer, DMode); err != nil {
+		return
+	}
+	if err = os.Mkdir(folderPaths.BackendStoreStoring, DMode); err != nil {
 		return
 	}
 	if err = os.Mkdir(folderPaths.BackendTXRX, DMode); err != nil {
@@ -161,15 +161,6 @@ func buildFolderPaths(folderPaths *FolderPaths) (err error) {
 	if err = os.Mkdir(folderPaths.FrontendLanding, DMode); err != nil {
 		return
 	}
-	if err = os.Mkdir(folderPaths.FrontendWidget, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.FrontendWidgetSafeButton, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.FrontendWidgetSelection, DMode); err != nil {
-		return
-	}
 	if err = os.Mkdir(folderPaths.FrontendTXRX, DMode); err != nil {
 		return
 	}
@@ -184,19 +175,7 @@ func buildFolderPaths(folderPaths *FolderPaths) (err error) {
 	if err = os.Mkdir(folderPaths.SharedMetaData, DMode); err != nil {
 		return
 	}
-	if err = os.Mkdir(folderPaths.SharedPaths, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.SharedStore, DMode); err != nil {
-		return
-	}
 	if err = os.Mkdir(folderPaths.SharedStoreRecord, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.SharedStoreStorer, DMode); err != nil {
-		return
-	}
-	if err = os.Mkdir(folderPaths.SharedStoreStoring, DMode); err != nil {
 		return
 	}
 	return

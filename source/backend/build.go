@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/josephbudd/kickfyne/source/backend/folder"
 	"github.com/josephbudd/kickfyne/source/backend/store"
 	"github.com/josephbudd/kickfyne/source/backend/txrx"
 	"github.com/josephbudd/kickfyne/source/utils"
@@ -15,6 +16,7 @@ const (
 
 // CreateFramework creates the backend/ files.
 func CreateFramework(
+	appName string,
 	importPrefix string,
 	folderPaths *utils.FolderPaths,
 ) (err error) {
@@ -31,6 +33,11 @@ func CreateFramework(
 		ImportPrefix: importPrefix,
 	}
 	if err = utils.ProcessTemplate(fileName, oPath, template, data); err != nil {
+		return
+	}
+
+	// backend/folder/
+	if err = folder.CreateFramework(appName, folderPaths); err != nil {
 		return
 	}
 

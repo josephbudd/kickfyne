@@ -91,7 +91,7 @@ func RecordFileName(recordName string) (fileName string) {
 // RecordFileRelativeFilePath returns the relative path for a record file.
 func RecordFileRelativeFilePath(recordName string) (relativeFilePath string) {
 	fName := MessageFileName(recordName) + relativeFilePathSuffix
-	relativeFilePath = path.Join(folderNameShared, folderNameStore, folderNameRecord, fName)
+	relativeFilePath = path.Join(folderNameShared, folderNameRecord, fName)
 	return
 }
 
