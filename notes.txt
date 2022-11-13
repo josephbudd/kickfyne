@@ -1,5 +1,10 @@
-after running panel add or panel remove "go mod init"
+Front-end
+frontend/frontend.go -> main/frontend.go
 
+Back-end
+backend/backend.go -> main/backend.go
+
+=============
 package main
 
 import (

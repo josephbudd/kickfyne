@@ -2,7 +2,6 @@ package backend
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/josephbudd/kickfyne/source/backend/folder"
 	"github.com/josephbudd/kickfyne/source/backend/store"
@@ -26,15 +25,6 @@ func CreateFramework(
 			err = fmt.Errorf("backend.CreateFramework: %w", err)
 		}
 	}()
-
-	// backend/backend.go
-	oPath := filepath.Join(folderPaths.Backend, fileName)
-	data := templateData{
-		ImportPrefix: importPrefix,
-	}
-	if err = utils.ProcessTemplate(fileName, oPath, template, data); err != nil {
-		return
-	}
 
 	// backend/folder/
 	if err = folder.CreateFramework(appName, folderPaths); err != nil {

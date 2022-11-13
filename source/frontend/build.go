@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/josephbudd/kickfyne/source/frontend/gui"
 	"github.com/josephbudd/kickfyne/source/frontend/landingscreen"
@@ -22,20 +21,8 @@ func CreateFramework(
 		}
 	}()
 
-	var oPath string
-	var data interface{}
-
 	// frontend/landing.go
 	if err = landingscreen.BuildLanding(importPrefix, folderPaths); err != nil {
-		return
-	}
-
-	// frontend/frontend.go
-	oPath = filepath.Join(folderPaths.Frontend, frontendFileName)
-	data = frontendTemplateData{
-		ImportPrefix: importPrefix,
-	}
-	if err = utils.ProcessTemplate(frontendFileName, oPath, frontendTemplate, data); err != nil {
 		return
 	}
 

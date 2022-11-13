@@ -16,15 +16,19 @@ var mainTemplate = `{{ $lCAppName := call .Funcs.LowerCase .AppName }}package ma
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
-	"{{ .ImportPrefix }}/backend"
+	betxrx "{{ .ImportPrefix }}/backend/txrx"
 	"{{ .ImportPrefix }}/backend/store"
-	"{{ .ImportPrefix }}/frontend"
+	"{{ .ImportPrefix }}/frontend/gui"
+	"{{ .ImportPrefix }}/frontend/gui/mainmenu"
+	"{{ .ImportPrefix }}/frontend/landingscreen"
+	fetxrx "{{ .ImportPrefix }}/frontend/txrx"
 	"{{ .ImportPrefix }}/shared/message"
 )
 
@@ -61,7 +65,7 @@ func main() {
 	go waitAndClose(w, ctx, ctxCancel, errCh)
 
 	// Start the front end.
-	if err = frontend.Start(ctx, ctxCancel, a, w); err != nil {
+	if err = frontendStart(ctx, ctxCancel, a, w); err != nil {
 		return
 	}
 
@@ -73,7 +77,7 @@ func main() {
 	// Start the back-end.
 	// backend.Start also opens and returns the stores.
 	// func waitAndClose will close the stores when the app ends.
-	if stores, err = backend.Start(ctx, ctxCancel); err != nil {
+	if stores, err = backendStart(ctx, ctxCancel); err != nil {
 		return
 	}
 
@@ -85,6 +89,49 @@ func main() {
 
 	// Start Fyne's event cycle.
 	a.Run()
+}
+
+// backendStart starts the backend.
+func backendStart(ctx context.Context, ctxCancel context.CancelFunc) (stores *store.Stores, err error) {
+	// Opens the stores.
+	if stores, err = store.New(); err != nil {
+		return
+	}
+	if err = stores.Open(); err != nil {
+		return
+	}
+	// Receive messages from the front-end.
+	betxrx.StartReceiver(ctx, ctxCancel, stores)
+	return
+}
+
+// frontendStart starts the front-end.
+func frontendStart(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, window fyne.Window) (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("frontend.Start: %w", err)
+		}
+	}()
+
+	// Initialize the view.
+	gui.Init(window)
+
+	// Show the landing screen.
+	if err = landingscreen.Init(ctx, ctxCancelFunc, app, window); err != nil {
+		return
+	}
+
+	// Initialize main menu.
+	// The developer must ensure that all panel groups should get initialized from main menu.
+	if err = mainmenu.Init(ctx, ctxCancelFunc, app, window); err != nil {
+		return
+	}
+
+	// Start communications with the back-end.
+	// The receiver will run as a concurrent process.
+	fetxrx.StartReceiver(ctx, ctxCancelFunc)
+	return
 }
 
 // waitAndClose waits for the context to end and then closes down.
