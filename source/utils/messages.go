@@ -10,10 +10,10 @@ import (
 const (
 	InitMessageName          = "Init"
 	chansMessageName         = "Chans"
-	initMessageNameInvalidF  = `The message name %q is too similar to message name "Init" which belongs to the framework, is used for the applicatioinlication initialization and can not be removed.`
-	chansMessageNameInvalidF = `The message name %q is too similar to the file name "chans.go" which belongs to the framework, defines message channels for the applicatioinlication and can not be removed.`
-	initMessageNameInvalid   = `The message name "Init" belongs to the framework, is used for the applicatioinlication initialization and can not be removed.`
-	chansMessageNameInvalid  = `The message name "Chans" is too much like the file name "chans.go" which belongs to the framework, defines message channels for the applicatioinlication and can not be removed.`
+	initMessageNameInvalidF  = `The message name %q is too similar to message name "Init" which belongs to the framework, is used for the application initialization and can not be removed.`
+	chansMessageNameInvalidF = `The message name %q is too similar to the file name "chans.go" which belongs to the framework, defines message channels for the application and can not be removed.`
+	initMessageNameInvalid   = `The message name "Init" belongs to the framework, is used for the application initialization and can not be removed.`
+	chansMessageNameInvalid  = `The message name "Chans" is too much like the file name "chans.go" which belongs to the framework, defines message channels for the application and can not be removed.`
 )
 
 // UserMessageNames returns each of the user added message names.

@@ -47,7 +47,7 @@ MANAGING RECORDS AND STORES:
 After a record is added:
 1. A search for KICKFYNE TODO will reveal instructions for proper developement and management of the record and store operation.
    1. The record definition needs to be completed so that the message can contain useful information.
-   2. The record's store interface and implementation may need modification. The records are by default, stored locally in easy to read yaml files. If that is not how the applicatioinlication is to handle data then modifications can be made to a record's store interface and implementation.
+   2. The record's store interface and implementation may need modification. The records are by default, stored locally in easy to read yaml files. If that is not how the application is to handle data then modifications can be made to a record's store interface and implementation.
 
 `
 	return

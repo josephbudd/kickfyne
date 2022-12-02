@@ -77,13 +77,13 @@ func handleFramework(pathWD string, args []string, isBuilt bool, importPrefix st
 	}()
 
 	if isBuilt {
-		fmt.Printf("Warning: The applicatioinlication is already built in %q\n", pathWD)
+		fmt.Printf("Warning: The application is already built in %q\n", pathWD)
 		return
 	}
 	importBase := filepath.Base(importPrefix)
 	currentWD := filepath.Base(pathWD)
 	if importBase != currentWD {
-		fmt.Println("Warning: You must run kickfyne inside the applicatioinlication's folder.")
+		fmt.Println("Warning: You must run kickfyne inside the application's folder.")
 		return
 	}
 	fmt.Printf("Creating the framework in %q.\n", pathWD)

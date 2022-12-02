@@ -44,7 +44,7 @@ const (
 	shortDuration = time.Second / time.Duration(2)
 )
 
-// Stores is each of the applicatioinlication's storers.
+// Stores is each of the application's storers.
 type Stores struct {
 {{- if $haveRecords }}
 
