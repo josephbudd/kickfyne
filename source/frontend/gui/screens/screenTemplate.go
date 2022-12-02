@@ -34,7 +34,7 @@ import (
 type screenComponents struct {
 	ctx                  context.Context
 	ctxCancel            context.CancelFunc
-	app                  fyne.App
+	application          fyne.App
 	window               fyne.Window
 	loadedCh             chan gui.CanvasObjectProvider
 	loaded               bool
@@ -67,7 +67,7 @@ func CanvasObjectProvider() (canvasObjectProvider gui.CanvasObjectProvider) {
 
 // New constructs this screen.
 // Returns the error.
-func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window, loadedCh chan gui.CanvasObjectProvider) (err error) {
+func New(ctx context.Context, ctxCancel context.CancelFunc, application fyne.App, w fyne.Window, loadedCh chan gui.CanvasObjectProvider) (err error) {
 
 	defer func() {
 		if err != nil {
@@ -90,7 +90,7 @@ func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne
 	packageScreen = &screenComponents{
 		ctx:                  ctx,
 		ctxCancel:            ctxCancel,
-		app:                  app,
+		application:          application,
 		window:               w,
 		canvasObjectProvider: gui.NewScreenCanvasManager(),
 		panels:               &panels{},

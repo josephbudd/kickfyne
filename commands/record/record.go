@@ -33,7 +33,7 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 	switch args[0] {
 	case verbAdd:
 		if !isBuilt {
-			fmt.Println("The app must be initialized before a record can be added.")
+			fmt.Println("The applicatioinlication must be initialized before a record can be added.")
 			return
 		}
 		if len(args) < 2 {
@@ -66,7 +66,7 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		fmt.Printf("KICKFYNE TODO: The storer interface implementation at %s may need some editing.\n", recordStoringPath)
 	case verbRemove:
 		if !isBuilt {
-			fmt.Println("The app must be initialized before a record can be removed.")
+			fmt.Println("The applicatioinlication must be initialized before a record can be removed.")
 			return
 		}
 		if len(args) < 2 {
@@ -93,7 +93,7 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		fmt.Printf("Success. Record named %q removed.", args[1])
 	case verbList:
 		if !isBuilt {
-			fmt.Println("The app must be initialized before a record names can be listed.")
+			fmt.Println("The application must be initialized before a record names can be listed.")
 			return
 		}
 		var folderPaths *utils.FolderPaths

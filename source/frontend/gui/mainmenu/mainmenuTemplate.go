@@ -38,8 +38,8 @@ var (
 	menu          *fyne.Menu
 )
 
-// Init builds the main menu and adds it to the app.
-func Init(ctx context.Context, cCFunc context.CancelFunc, app fyne.App, w fyne.Window) (err error) {
+// Init builds the main menu and adds it to the application.
+func Init(ctx context.Context, cCFunc context.CancelFunc, application fyne.App, w fyne.Window) (err error) {
 
 	defer func() {
 		if err != nil {

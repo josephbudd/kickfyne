@@ -27,7 +27,7 @@ func CreateFramework(
 	return
 }
 
-// AppMetaDataFilePath returns the path to the app's meta data file.
+// AppMetaDataFilePath returns the path to the application's meta data file.
 func AppMetaDataFilePath(folderPaths *utils.FolderPaths) (path string) {
 	path = filepath.Join(folderPaths.SharedMetaData, metadataFileName)
 	return

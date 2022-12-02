@@ -15,8 +15,8 @@ The framework is contained in 4 folders.
 4. ./shared/ which contains shared code.
 
 🔨 BUILDING THE APP:
-You can build the app after running the command "＄ kickfyne framework".
-The following build example is done in the app's folder.
+You can build the applicatioinlication after running the command "＄ kickfyne framework".
+The following build example is done in the applicatioinlication's folder.
 
 ＄ go mod tidy
 ＄ go build

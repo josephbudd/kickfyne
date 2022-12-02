@@ -65,7 +65,7 @@ func new{{ call .Funcs.Cap .PanelName }}(screen *screenComponents) (panel *{{ .P
 	return
 }
 
-func (panel *{{ .PanelName }}Components) accordionItems(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window) (items []*widget.AccordionItem, err error) {
+func (panel *{{ .PanelName }}Components) accordionItems(ctx context.Context, ctxCancel context.CancelFunc, application fyne.App, w fyne.Window) (items []*widget.AccordionItem, err error) {
 
 	defer func() {
 		if len(items) == 0 {

@@ -12,7 +12,7 @@ import (
 
 var window fyne.Window
 
-// Init sets the app window var.
+// Init sets the application window var.
 func Init(w fyne.Window) {
 	window = w
 }
@@ -31,7 +31,7 @@ type CanvasObjectProvider interface {
 // ScreenCanvasWatcher sets a target's canvas object with an updated screen canvas object.
 // For example:
 // The type windowScreenCanvasObjectWatcher:
-// * Updates the app's window with it's func Watch.
+// * Updates the application's window with it's func Watch.
 // * Use it for button's.
 // * Use if for main menu navigation.
 // The type TabItemScreenCanvasObjectWatcher:

@@ -9,7 +9,7 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-// currentWindowScreenCanvasObjectWatcher is the current watcher for the app window content.
+// currentWindowScreenCanvasObjectWatcher is the current watcher for the application window content.
 var currentWindowScreenCanvasObjectWatcher ScreenCanvasWatcher
 
 // windowScreenCanvasObjectWatcher implements ScreenCanvasWatcher

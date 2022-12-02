@@ -87,7 +87,7 @@ func addReceiver(receiver Receiver, msgID uint64) (err error) {
 }
 
 // StartReceiver starts receiving messages from the back-end and dispathes them to the front-end.
-// If a fatal message is received it logs it and closes the app.
+// If a fatal message is received it logs it and closes the application.
 func StartReceiver(ctx context.Context, ctxCancel context.CancelFunc) {
 	go func(ctx context.Context, ctxCancel context.CancelFunc) {
 		for {

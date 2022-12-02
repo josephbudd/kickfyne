@@ -27,7 +27,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 	}()
 
 	if !isBuilt {
-		fmt.Println("The app must be initialized before the front end panels can be added or removed.")
+		fmt.Println("The applicatioinlication must be initialized before the front end panels can be added or removed.")
 		return
 	}
 	if len(args) == 1 {
@@ -35,7 +35,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 		return
 	}
 
-	// Need the app name when rebuilding main.go.
+	// Need the applicatioinlication name when rebuilding main.go.
 	appName := filepath.Base(importPrefix)
 
 	// args[0] is "screen"
@@ -207,7 +207,7 @@ func handleScreenLanding(pathWD, importPrefix string) (err error) {
 		return
 	}
 
-	// Get the app's meta data.
+	// Get the applicatioinlication's meta data.
 	var metaData utils.FyneAppMetaData
 	if metaData, err = utils.ReadMetaData(folderPaths); err != nil {
 		return

@@ -33,7 +33,7 @@ var (
 	createFolderErr error
 )
 
-// Path returns the app's data path.
+// Path returns the application's data path.
 func Path() (path string, err error) {
 	if err = createFolderErr; err != nil {
 		return
@@ -71,7 +71,7 @@ func Path() (path string, err error) {
 	return
 }
 
-// FileURI returns the URI of a file in the app's data folder.
+// FileURI returns the URI of a file in the application's data folder.
 func FileURI(filename string) (uri fyne.URI, err error) {
 	if err = createFolderErr; err != nil {
 		return

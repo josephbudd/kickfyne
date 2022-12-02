@@ -44,7 +44,7 @@ const (
 	shortDuration = time.Second / time.Duration(2)
 )
 
-// Stores is each of the application's storers.
+// Stores is each of the applicatioinlication's storers.
 type Stores struct {
 {{- if $haveRecords }}
 
@@ -239,7 +239,7 @@ func (stores *Stores) CloseTimeout(seconds int) (err error) {
 
 // close closes every store.
 // It returns all of the errors as one single error.
-// stores.Close is called by main.waitAndClose when the app shuts down.
+// stores.Close is called by main.waitAndClose when the application shuts down.
 // Uses no locks.
 func (stores *Stores) close() (err error) {
 	if err = storesErr; err != nil {

@@ -28,7 +28,7 @@ func NewScreenCanvasManager() (screenCanvasManager *ScreenCanvasManager) {
 	return
 }
 
-// BindToWindow makes the ScreenCanvasManager window watcher the current app window watcher.
+// BindToWindow makes the ScreenCanvasManager window watcher the current application window watcher.
 func (screenCanvasManager *ScreenCanvasManager) BindToWindow() {
 	SetCurrentWindowScreenCanvasObjectWatcher(screenCanvasManager.windowWatcher, screenCanvasManager.canvasObject)
 }

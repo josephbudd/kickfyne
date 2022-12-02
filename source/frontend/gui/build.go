@@ -59,7 +59,7 @@ func CreateFramework(
 	// gui/screens/<metaData.FrontEnd.Landing>/ package with no panels.
 	if err = screens.BuildPackageWithoutPanels(
 		metaData.FrontEnd.Landing,
-		fmt.Sprintf("Package %s is the application's default landing screen.", metaData.FrontEnd.Landing),
+		fmt.Sprintf("Package %s is the applicatioinlication's default landing screen.", metaData.FrontEnd.Landing),
 		importPrefix,
 		folderPaths,
 	); err != nil {

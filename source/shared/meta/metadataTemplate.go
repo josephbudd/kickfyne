@@ -32,7 +32,7 @@ type AppData struct {
 var appData = AppData{}
 var loadErr error
 
-// Data returns the app's meta data.
+// Data returns the application's meta data.
 func Data() (data AppData, err error) {
 	if err = loadErr; err != nil {
 		return

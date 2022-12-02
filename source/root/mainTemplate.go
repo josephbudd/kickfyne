@@ -81,7 +81,7 @@ func main() {
 
 	// Start the back-end.
 	// backend.Start also opens and returns the stores.
-	// func waitAndClose will close the stores when the application ends.
+	// func waitAndClose will close the stores when the applicatioinlication ends.
 	if stores, err = backendStart(ctx, ctxCancel); err != nil {
 		return
 	}

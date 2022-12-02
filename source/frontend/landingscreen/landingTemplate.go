@@ -18,7 +18,7 @@ import (
 
 var landingScreen gui.CanvasObjectProvider
 
-// Init binds the landing screen to the app window.
+// Init binds the landing screen to the application window.
 func Init() {
 	landingScreen = {{ .LandingScreenName }}.CanvasObjectProvider()
 	// Show the landing screen right away even if it's not full of content.
