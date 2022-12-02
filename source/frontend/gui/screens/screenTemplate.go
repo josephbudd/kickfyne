@@ -31,92 +31,85 @@ import (
 
 // screenComponents is this screen, it's panels and messenger.
 // This screen has {{ len .PanelNames }} panels.
-{{- if ne (len .DefaultPanelName ) 0 }}
-// The default panel is {{ .DefaultPanelName }}.
-{{- end }}
 type screenComponents struct {
-	ctx       context.Context
-	ctxCancel context.CancelFunc
-	app       fyne.App
-	window    fyne.Window
-
+	ctx                  context.Context
+	ctxCancel            context.CancelFunc
+	app                  fyne.App
+	window               fyne.Window
+	loadedCh             chan gui.CanvasObjectProvider
+	loaded               bool
 	canvasObjectProvider gui.CanvasObjectProvider
-{{- if ne (len .PanelNames) 0 }}
 	panels               *panels
-{{- end}}
 	messenger            *messageHandler
 }
-{{- if ne (len .PanelNames) 0 }}
 
 type panels struct {
- {{- range $panelName := .PanelNames }}
+{{- range $panelName := .PanelNames }}
 	{{ $panelName }}   *{{ $panelName }}Components
- {{- end}}
-}
 {{- end}}
+}
 
-var packageScreen *screenComponents
-var initErr error
-
-// New returns the screen's canvas object provider and the error. 
-// If needed, it constructs this screen.
-// * It constructs each panel in this screen.
-// * It constructs the messenger.
-// * It uses the default panel contents to create the screen content.
-// If this screen has already been constructed then it uses the already constructed screen.
-func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window) (canvasObjectProvider gui.CanvasObjectProvider, err error) {
-
-	if packageScreen != nil {
-		canvasObjectProvider = packageScreen.canvasObjectProvider
-		err = initErr
+func (screen *screenComponents) signalLoaded() {
+	if screen.loaded {
 		return
 	}
+	screen.loaded = true
+	screen.loadedCh <- screen.canvasObjectProvider
+}
 
-	var newScreen *screenComponents
+var packageScreen *screenComponents
+
+// CanvasObjectProvider returns the screen's gui.CanvasObjectProvider.
+func CanvasObjectProvider() (canvasObjectProvider gui.CanvasObjectProvider) {
+	canvasObjectProvider = packageScreen.canvasObjectProvider
+	return
+}
+
+// New constructs this screen.
+// Returns the error.
+func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window, loadedCh chan gui.CanvasObjectProvider) (err error) {
+
 	defer func() {
-		if err == nil {
-			packageScreen = newScreen
-			canvasObjectProvider = packageScreen.canvasObjectProvider
-		}
 		if err != nil {
-			err = fmt.Errorf("{{ .PackageName }}.New: %w", err)
-			initErr = err
+			err = fmt.Errorf("courses.New: %w", err)
+			return
 		}
+
+		/* Signal that the screen has loaded.
+
+		   KICKFYNE TODO:
+		   If the displaying of the initial content in panels may be delayed
+		    you should not call packageScreen.signalLoaded() here.
+		   Instead you could call it inside the message receive func loading the panel.
+		   That's because the message dispather dispatches messages using go threads.
+		   Call it after the last panel has loaded.
+		*/
+		packageScreen.signalLoaded()
 	}()
 
-	newScreen = &screenComponents{
+	packageScreen = &screenComponents{
 		ctx:                  ctx,
 		ctxCancel:            ctxCancel,
 		app:                  app,
 		window:               w,
 		canvasObjectProvider: gui.NewScreenCanvasManager(),
-{{- if ne (len .PanelNames) 0 }}
 		panels:               &panels{},
-{{- end}}
-		}
-	canvasObjectProvider = newScreen.canvasObjectProvider
+		loadedCh:             loadedCh,
+	}
 
 	// Make sure the canvasObjectProvider is constructed.
 {{- if ne (len .PanelNames) 0 }}
 
 	// Construct each panel building panel content.
-	// Do the default panel last.
  {{- range $panelName := .PanelNames }}
   {{- if ne $panelName $DOT.DefaultPanelName }}
+    // {{ $DOT.Func.Cap $panelName }}
 	var {{ $panelName }} *{{ $panelName }}Components
-	if {{ $panelName }}, err = new{{ call $DOT.Funcs.Cap $panelName }}Components(newScreen); err != nil {
+	if {{ $panelName }}, err = new{{ $DOT.Func.Cap $panelName }}Components(packageScreen); err != nil {
 		return
 	}
-	newScreen.panels.{{ $panelName }} = {{ $panelName }}
+	packageScreen.panels.{{ $panelName }}Panel = {{ $panelName }}Panel
   {{- end }}
- {{- end }}
- {{- if ne (len .DefaultPanelName) 0 }}
-	var {{ .DefaultPanelName }} *{{ .DefaultPanelName }}Components
-	if {{ .DefaultPanelName }}, err = new{{ call .Funcs.Cap .DefaultPanelName }}Components(newScreen); err != nil {
-		return
-	}
-	newScreen.panels.{{ .DefaultPanelName }} = {{ .DefaultPanelName }}
-	newScreen.canvasObjectProvider.UpdateCanvasObject({{ .DefaultPanelName }}.content)
  {{- end }}
 {{- else }}
 
@@ -125,10 +118,10 @@ func New(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne
 		widget.NewLabel("This is the {{ .PackageName }} screen package."),
 		widget.NewLabel("This screen package does not have any panels."),
 	)
-	newScreen.canvasObjectProvider.UpdateCanvasObject(content)
+	packageScreen.canvasObjectProvider.UpdateCanvasObject(content)
 {{- end }}
 	// Messenger.
-	newScreen.messenger = newMessageHandler(newScreen)
+	packageScreen.messenger = newMessageHandler(packageScreen)
 	return
 }
 

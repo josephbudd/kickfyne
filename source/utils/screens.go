@@ -75,10 +75,15 @@ func ScreenPackageNames(folderPaths *FolderPaths) (screenNames []string, err err
 
 	var folderNames []string
 	folderNames, err = FolderNames(folderPaths.FrontendGUIScreens)
+	if len(folderNames) == 0 {
+		// This happens with kickfyne framework.
+		// Add the name of the soon to be added home screen package folder.
+		folderNames = []string{HomeScreenPackageName}
+	}
 	screenNames = make([]string, 0, len(folderNames))
-	for _, fileName := range folderNames {
-		if fileName == strings.ToLower(fileName) {
-			screenNames = append(screenNames, fileName)
+	for _, folderName := range folderNames {
+		if folderName == strings.ToLower(folderName) {
+			screenNames = append(screenNames, folderName)
 		}
 	}
 	return

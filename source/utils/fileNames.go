@@ -6,12 +6,13 @@ import (
 )
 
 const (
-	panelFileSuffix     = "Panel.go"
-	goFileExt           = ".go"
-	FyneAppTOMLFileName = "FyneApp.toml"
-	ScreenFileName      = "screen.go"
-	PanelNameSuffix     = "Panel"
-	DocFileName         = "doc.go"
+	panelFileSuffix       = "Panel.go"
+	goFileExt             = ".go"
+	FyneAppTOMLFileName   = "FyneApp.toml"
+	HomeScreenPackageName = "home"
+	ScreenFileName        = "screen.go"
+	PanelNameSuffix       = "Panel"
+	DocFileName           = "doc.go"
 
 	AccordionPanelFileName = "accordionPanel.go"
 	AccordionPanelName     = "accordionPanel"

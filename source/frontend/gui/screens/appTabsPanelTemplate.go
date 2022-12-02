@@ -13,7 +13,6 @@ const (
 	appTabsPanelTemplate = `package {{ .PackageName }}
 
 import (
-	"context"
 	"fmt"
 
 	"fyne.io/fyne/v2"
@@ -50,7 +49,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 	// Build the tabItems.
 	apptabs := container.NewAppTabs()
 	var tabItems []*container.TabItem
-	if tabItems, err = panel.tabItems(screen.ctx, screen.ctxCancel, screen.app, screen.window, apptabs); err != nil {
+	if tabItems, err = panel.tabItems(apptabs); err != nil {
 		return
 	}
 	// Build the AppTabs container.
@@ -65,7 +64,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 	return
 }
 
-func (panel *apptabsPanelComponents) tabItems(ctx context.Context, ctxCancel context.CancelFunc, app fyne.App, w fyne.Window, apptabs *container.AppTabs) (items []*container.TabItem, err error) {
+func (panel *apptabsPanelComponents) tabItems(apptabs *container.AppTabs) (items []*container.TabItem, err error) {
 
 	defer func() {
 		if len(items) == 0 {

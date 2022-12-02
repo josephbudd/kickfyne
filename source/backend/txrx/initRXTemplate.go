@@ -14,8 +14,6 @@ import (
 	"{{ .ImportPrefix }}/backend/store"
 )
 
-const initF = "receiveInit: %s"
-
 func init() {
 	addReceiver(message.InitID, receiveInit)
 }
@@ -23,19 +21,12 @@ func init() {
 func receiveInit(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {
 
 	initMsg := msg.(*message.Init)
-	var err, fatal error
+	var fatal error
 	defer func() {
-		switch {
-		case err != nil:
-			initMsg.Error = true
-			initMsg.ErrorMessage = fmt.Sprintf(initF, err.Error())
-			Send(initMsg)
-		case fatal != nil:
+		if fatal != nil {
 			initMsg.Fatal = true
-			initMsg.ErrorMessage = fmt.Sprintf(initF, fatal.Error())
+			initMsg.ErrorMessage = fmt.Sprintf("receiveInit: %s", fatal.Error())
 			Send(initMsg)
-		default:
-			// No errors so don't send back the Init message.
 		}
 	}()
 

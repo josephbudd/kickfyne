@@ -34,7 +34,7 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 	switch args[0] {
 	case verbAdd:
 		if !isBuilt {
-			fmt.Println("The app must be initailized before a message can be added.")
+			fmt.Println("The app must be initialized before a message can be added.")
 			return
 		}
 		if len(args) < 2 {
@@ -67,9 +67,10 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		fmt.Printf("Success. Message named %q added.\n", args[1])
 		fmt.Printf("KICKFYNE TODO: The message definition at %s may need some editing.\n", messageDefinitionPath)
 		fmt.Printf("KICKFYNE TODO: The back-end message handler at %s may need some editing.\n", messageHandlerPath)
+		fmt.Println("KICKFYNE TODO: Some front-end screen message handlers will need to use the message.")
 	case verbRemove:
 		if !isBuilt {
-			fmt.Println("The app must be initailized before a message can be removed.")
+			fmt.Println("The app must be initialized before a message can be removed.")
 			return
 		}
 		if len(args) < 2 {
@@ -100,7 +101,7 @@ func Handler(pathWD string, args []string, isBuilt bool, importPrefix string) (e
 		fmt.Printf("Success. Message named %q removed.\n", args[1])
 	case verbList:
 		if !isBuilt {
-			fmt.Println("The app must be initailized before a message names can be listed.")
+			fmt.Println("The app must be initialized before a message names can be listed.")
 			return
 		}
 		var folderPaths *utils.FolderPaths

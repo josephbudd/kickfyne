@@ -7,12 +7,14 @@ const (
 )
 
 type mainTemplateData struct {
-	ImportPrefix string
-	AppName      string
-	Funcs        utils.Funcs
+	ImportPrefix       string
+	AppName            string
+	ScreenPackageNames []string
+	HomePackageName    string
+	Funcs              utils.Funcs
 }
 
-var mainTemplate = `{{ $lCAppName := call .Funcs.LowerCase .AppName }}package main
+var mainTemplate = `{{ $DOT := . }}package main
 
 import (
 	"context"
@@ -23,11 +25,10 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
-	betxrx "{{ .ImportPrefix }}/backend/txrx"
 	"{{ .ImportPrefix }}/backend/store"
+	betxrx "{{ .ImportPrefix }}/backend/txrx"
 	"{{ .ImportPrefix }}/frontend/gui"
 	"{{ .ImportPrefix }}/frontend/gui/mainmenu"
-	"{{ .ImportPrefix }}/frontend/landingscreen"
 	fetxrx "{{ .ImportPrefix }}/frontend/txrx"
 	"{{ .ImportPrefix }}/shared/message"
 )
@@ -69,20 +70,24 @@ func main() {
 		return
 	}
 
-	size := size16x9(1000, 0)
-	w.Resize(size)
-	w.CenterOnScreen()
+	// Size and position the window.
+	if !fyne.CurrentDevice().IsMobile() {
+		w.Resize(size16x9(1000, 0))
+		w.CenterOnScreen()
+	} else {
+		w.SetFullScreen(true)
+	}
 	w.Show()
 
 	// Start the back-end.
 	// backend.Start also opens and returns the stores.
-	// func waitAndClose will close the stores when the app ends.
+	// func waitAndClose will close the stores when the application ends.
 	if stores, err = backendStart(ctx, ctxCancel); err != nil {
 		return
 	}
 
 	// Send the init message to the back-end letting it know that the front end is ready.
-	// See backend/txrx/init.go for details on 
+	// See backend/txrx/init.go for details on
 	// * completing any backend initializations.
 	// * sending messages to the front-end with data for the panels to display.
 	message.FrontEndToBackEnd <- message.NewInit()
@@ -93,6 +98,13 @@ func main() {
 
 // backendStart starts the backend.
 func backendStart(ctx context.Context, ctxCancel context.CancelFunc) (stores *store.Stores, err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("main.backendStart: %w", err)
+		}
+	}()
+
 	// Opens the stores.
 	if stores, err = store.New(); err != nil {
 		return
@@ -100,37 +112,26 @@ func backendStart(ctx context.Context, ctxCancel context.CancelFunc) (stores *st
 	if err = stores.Open(); err != nil {
 		return
 	}
+
 	// Receive messages from the front-end.
 	betxrx.StartReceiver(ctx, ctxCancel, stores)
 	return
 }
 
 // frontendStart starts the front-end.
-func frontendStart(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, window fyne.Window) (err error) {
+func frontendStart(ctx context.Context, ctxCancelFunc context.CancelFunc, application fyne.App, window fyne.Window) (err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("frontend.Start: %w", err)
+			err = fmt.Errorf("main.frontendStart: %w", err)
 		}
 	}()
 
 	// Initialize the view.
 	gui.Init(window)
 
-	// Show the landing screen.
-	if err = landingscreen.Init(ctx, ctxCancelFunc, app, window); err != nil {
-		return
-	}
-
-	// Initialize main menu.
-	// The developer must ensure that all panel groups should get initialized from main menu.
-	if err = mainmenu.Init(ctx, ctxCancelFunc, app, window); err != nil {
-		return
-	}
-
-	// Start communications with the back-end.
-	// The receiver will run as a concurrent process.
-	fetxrx.StartReceiver(ctx, ctxCancelFunc)
+	// Build the screens.
+	screenStart(ctx, ctxCancelFunc, application, window)
 	return
 }
 
@@ -154,12 +155,12 @@ func waitAndClose(w fyne.Window, ctx context.Context, ctxCancel context.CancelFu
 
 	select {
 	case <-ctx.Done():
+		clErr = stores.CloseTimeout(1)
 		w.Close()
-		clErr = stores.Close()
 		return
 	case err = <-errCh:
+		clErr = stores.CloseTimeout(1)
 		w.Close()
-		clErr = stores.Close()
 		return
 	}
 }
@@ -190,6 +191,51 @@ func size16x9(width, height int) (size fyne.Size) {
 	}
 	size = fyne.Size{Width: newWidth, Height: newHeight}
 	return
+}
+
+// screenStart starts the screens.
+func screenStart(ctx context.Context, ctxCancelFunc context.CancelFunc, application fyne.App, window fyne.Window) (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("main.frontendStart: %w", err)
+		}
+	}()
+
+	// Initialize main menu.
+	if err = mainmenu.Init(ctx, ctxCancelFunc, application, window); err != nil {
+		return
+	}
+
+	screenLoadedCh := make(chan gui.CanvasObjectProvider, countScreens)
+	if err = startScreens(ctx, ctxCancelFunc, application, window, screenLoadedCh); err != nil {
+		return
+	}
+
+	// Start communications with the back-end.
+	// The receiver will run as a concurrent process.
+	fetxrx.StartReceiver(ctx, ctxCancelFunc)
+
+	// Wait for the screens to load and then add the main menu.
+	go waitToAddMainMenu(ctx, screenLoadedCh)
+	return
+}
+
+func waitToAddMainMenu(ctx context.Context, screenLoadedCh chan gui.CanvasObjectProvider) {
+	// Wait for the all the screens to load.
+	var countLoaded int
+	nScreens := cap(screenLoadedCh)
+	for countLoaded < nScreens {
+		select {
+		case <-screenLoadedCh:
+			countLoaded++
+		case <-ctx.Done():
+			return
+		}
+	}
+	// All the screens are loaded.
+	// Display the main menu.
+	mainmenu.Reset(nil)
 }
 
 `

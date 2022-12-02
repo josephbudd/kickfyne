@@ -18,7 +18,7 @@ func handlePanel(pathWD string, args []string, isBuilt bool, importPrefix string
 	}()
 
 	if !isBuilt {
-		fmt.Println("The app must be initailized before the front end panels can be added or removed.")
+		fmt.Println("The app must be initialized before the front end panels can be added or removed.")
 		return
 	}
 	if len(args) == 1 {

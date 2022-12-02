@@ -13,7 +13,6 @@ const (
 	doctabsPanelTemplate = `package {{ .PackageName }}
 
 import (
-	"context"
 	"fmt"
 
 	"fyne.io/fyne/v2"
@@ -50,7 +49,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 	// Build the tabItems.
 	doctabs := container.NewDocTabs()
 	var tabItems []*container.TabItem
-	if tabItems, err = panel.tabItems(screen.ctx, screen.ctxCancel, screen.app, screen.window, doctabs); err != nil {
+	if tabItems, err = panel.tabItems(doctabs); err != nil {
 		return
 	}
 	// Build the DocTabs container.
@@ -65,7 +64,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 	return
 }
 
-func (panel *{{ .PanelName }}Components, doctabs *container.DocTabs) tabItems() (items []*container.TabItem, err error) {
+func (panel *{{ .PanelName }}Components) tabItems(doctabs *container.DocTabs) (items []*container.TabItem, err error) {
 
 	defer func() {
 		if len(items) == 0 {
@@ -106,9 +105,9 @@ func (panel *{{ .PanelName }}Components, doctabs *container.DocTabs) tabItems() 
 }
 
 // addScreenWatcherItem creates and adds a TabItem with a canvas object provided by another screen.
-func (panel *{{ .PanelName }}Components) addScreenWatcherItem(label string, otherScreen gui.CanvasObjectProvider) (tabItem *container.TabItem) {
+func (panel *{{ .PanelName }}Components) addScreenWatcherItem(label string, otherScreen gui.CanvasObjectProvider, doctabs doctabs *container.DocTabs) (tabItem *container.TabItem) {
 	var watcher *gui.TabItemScreenCanvasObjectWatcher
-	tabItem, watcher = gui.NewTabItemScreenCanvasObjectWatcher(label, otherScreen)
+	tabItem, watcher = gui.NewTabItemScreenCanvasObjectWatcher(label, otherScreen, doctabs)
 	panel.screenWatchers[tabItem] = watcher
 	return
 }

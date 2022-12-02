@@ -76,9 +76,6 @@ func FileURI(filename string) (uri fyne.URI, err error) {
 	if err = createFolderErr; err != nil {
 		return
 	}
-	if uri = appDataURI; uri != nil {
-		return
-	}
 
 	defer func() {
 		if err != nil {

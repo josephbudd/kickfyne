@@ -32,13 +32,17 @@ This is the implementation of the {{ .RecordName }}Storer interface defined in {
 There fore, any changes made here must be reflected in {{ .StorerFilePath }}.
 */
 
-var Err{{ .RecordName }}Full = fmt.Errorf("{{ .RecordName }}Store is full")
+var (
+	Err{{ .RecordName }}StoreFull   = fmt.Errorf("{{ .RecordName }}Store is full")
+	Err{{ .RecordName }}StoreOpen   = fmt.Errorf("{{ .RecordName }}Store is open")
+	Err{{ .RecordName }}StoreClosed = fmt.Errorf("{{ .RecordName }}Store is closed")
+)
 
-type by{{ .RecordName }}ID []record.{{ .RecordName }}
+type by{{ .RecordName }} []record.{{ .RecordName }}
 
-func (bcn by{{ .RecordName }}ID) Len() int           { return len(bcn) }
-func (bcn by{{ .RecordName }}ID) Swap(i, j int)      { bcn[i], bcn[j] = bcn[j], bcn[i] }
-func (bcn by{{ .RecordName }}ID) Less(i, j int) bool { return bcn[i].ID < bcn[j].ID }
+func (by by{{ .RecordName }}) Len() int           { return len(by) }
+func (by by{{ .RecordName }}) Swap(i, j int)      { by[i], by[j] = by[j], by[i] }
+func (by by{{ .RecordName }}) Less(i, j int) bool { return by[i].ID < by[j].ID }
 
 type {{ .RecordName }}Data struct {
 	LastID  uint64
@@ -48,19 +52,23 @@ type {{ .RecordName }}Data struct {
 // {{ .RecordName }}Store is the API of the {{ .RecordName }} store.
 // It is the implementation of the interface in /domain/store/storer/{{ .RecordName }}.go.
 type {{ .RecordName }}Store struct {
-	uri  fyne.URI
-	lock sync.Mutex
-	data {{ .RecordName }}Data
+	uri          fyne.URI
+	lock         sync.Mutex
+	data         {{ .RecordName }}Data
+	blockClose   func()
+	unBlockClose func()
+	isOpen       bool
 }
 
 // New{{ .RecordName }}Store constructs a new {{ .RecordName }}Store.
-// Param db is an open bolt data-store.
-// Returns a pointer to the new {{ .RecordName }}Store.
-func New{{ .RecordName }}Store() (store *{{ .RecordName }}Store, err error) {
+// Param blockClose is the func that blocks closing this store.
+// Param unBlockClose is the func that allows this store to be closed.
+// Returns a pointer to the new {{ .RecordName }}Store and the error.
+func New{{ .RecordName }}Store(blockClose func(), unBlockClose func()) (store *{{ .RecordName }}Store, err error) {
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("NewCourseStore: %w", err)
+			err = fmt.Errorf("New{{ .RecordName }}Store: %w", err)
 		}
 	}()
 
@@ -69,12 +77,15 @@ func New{{ .RecordName }}Store() (store *{{ .RecordName }}Store, err error) {
 		return
 	}
 	store = &{{ .RecordName }}Store{
-		uri: {{ call .Funcs.DeCap .RecordName }}StoreURI,
+		uri:          {{ call .Funcs.DeCap .RecordName }}StoreURI,
+		blockClose:   blockClose,
+		unBlockClose: unBlockClose,
 	}
 	return
 }
 
 // IsFull returns if the store is full.
+// Does not blocks closes.
 func (store *{{ .RecordName }}Store) IsFull() (isFull bool) {
 	isFull = (store.data.LastID == math.MaxUint64)
 	return
@@ -82,6 +93,7 @@ func (store *{{ .RecordName }}Store) IsFull() (isFull bool) {
 
 // NextID returns the next available id.
 // Returns the error if there are no more ids.
+// Does not blocks closes.
 func (store *{{ .RecordName }}Store) NextID() (nextID uint64, err error) {
 
 	defer func() {
@@ -97,7 +109,7 @@ func (store *{{ .RecordName }}Store) NextID() (nextID uint64, err error) {
 	return
 }
 
-// Open opens the bolt data-store.
+// Open opens the store.
 // Keeps the file in memory.
 // Returns the error.
 func (store *{{ .RecordName }}Store) Open() (err error) {
@@ -108,14 +120,19 @@ func (store *{{ .RecordName }}Store) Open() (err error) {
 		}
 	}()
 
+	if store.isOpen {
+		err = Err{{ .RecordName }}StoreOpen
+		return
+	}
+
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
 	if err = store.readAll(); err != nil {
 		return
 	}
-	sort.Sort(by{{ .RecordName }}ID(store.data.Records))
-
+	sort.Sort(by{{ .RecordName }}(store.data.Records))
+	store.isOpen = true
 	return
 }
 
@@ -129,15 +146,20 @@ func (store *{{ .RecordName }}Store) Close() (err error) {
 		}
 	}()
 
-	// The store is always closed.
+	if !store.isOpen {
+		return
+	}
+
+	store.isOpen = false
 	return
 }
 
-// Get retrieves one record.{{ .RecordName }} from the data-store.
+// Get retrieves one record.{{ .RecordName }} from the store.
 // Param id is the record ID.
 // Returns a record.{{ .RecordName }} and error.
 // When no record is found, the returned record.{{ .RecordName }} is nil and the returned error is nil.
 // Use {{ .RecordName }}.IsZero() to determine if the returned record is zero meaning not found.
+// Does not blocks closes.
 func (store *{{ .RecordName }}Store) Get(id uint64) (r record.{{ .RecordName }}, err error) {
 
 	defer func() {
@@ -145,6 +167,11 @@ func (store *{{ .RecordName }}Store) Get(id uint64) (r record.{{ .RecordName }},
 			err = fmt.Errorf("{{ .RecordName }}Store.Get: %w", err)
 		}
 	}()
+
+	if !store.isOpen {
+		err = Err{{ .RecordName }}StoreClosed
+		return
+	}
 
 	store.lock.Lock()
 	defer store.lock.Unlock()
@@ -159,9 +186,10 @@ func (store *{{ .RecordName }}Store) Get(id uint64) (r record.{{ .RecordName }},
 	return
 }
 
-// GetAll retrieves all of the record.{{ .RecordName }} records from the data-store.
+// GetAll retrieves all of the record.{{ .RecordName }} records from the store.
 // Returns a slice of record.{{ .RecordName }} and error.
 // When no records are found, the returned slice length is 0 and the returned error is nil.
+// Does not blocks closes.
 func (store *{{ .RecordName }}Store) GetAll() (rr []record.{{ .RecordName }}, err error) {
 
 	defer func() {
@@ -169,6 +197,11 @@ func (store *{{ .RecordName }}Store) GetAll() (rr []record.{{ .RecordName }}, er
 			err = fmt.Errorf("{{ .RecordName }}Store.GetAll: %w", err)
 		}
 	}()
+
+	if !store.isOpen {
+		err = Err{{ .RecordName }}StoreClosed
+		return
+	}
 
 	store.lock.Lock()
 	defer store.lock.Unlock()
@@ -178,21 +211,29 @@ func (store *{{ .RecordName }}Store) GetAll() (rr []record.{{ .RecordName }}, er
 	return
 }
 
-// Update updates the record.{{ .RecordName }} in the data-store.
+// Update updates the record.{{ .RecordName }} in the store.
 // Param newR is the record.{{ .RecordName }} to be updated.
 // If newR is a new record then updatedR has the new ID.
 // Returns the updated record and the error.
+// Blocks closes during it write to the store.
 func (store *{{ .RecordName }}Store) Update(newR record.{{ .RecordName }}) (updatedR record.{{ .RecordName }}, err error) {
 
 	defer func() {
 		if err == nil {
-			sort.Sort(by{{ .RecordName }}ID(store.data.Records))
+			sort.Sort(by{{ .RecordName }}(store.data.Records))
+			store.blockClose()
 			err = store.writeAll()
+			store.unBlockClose()
 		}
 		if err != nil {
 			err = fmt.Errorf("{{ .RecordName }}Store.Update: %w", err)
 		}
 	}()
+
+	if !store.isOpen {
+		err = Err{{ .RecordName }}StoreClosed
+		return
+	}
 
 	store.lock.Lock()
 	defer store.lock.Unlock()
@@ -221,29 +262,35 @@ func (store *{{ .RecordName }}Store) Update(newR record.{{ .RecordName }}) (upda
 	return
 }
 
-// UpdateAll updates a slice of record.{{ .RecordName }} in the data-store.
+// UpdateAll updates a slice of record.{{ .RecordName }} in the store.
 // Param newRR is the slice of record.{{ .RecordName }} to be updated.
 // Returns the updated version of each added record.
 // Returns the error.
+// Blocks closes during it write to the store.
 func (store *{{ .RecordName }}Store) UpdateAll(newRR []record.{{ .RecordName }}) (updatedRR []record.{{ .RecordName }}, err error) {
 
 	defer func() {
 		if err == nil {
-			sort.Sort(by{{ .RecordName }}ID(store.data.Records))
+			sort.Sort(by{{ .RecordName }}(store.data.Records))
+			store.blockClose()
 			err = store.writeAll()
+			store.unBlockClose()
 		}
 		if err != nil {
 			err = fmt.Errorf("{{ .RecordName }}Store.UpdateAll: %w", err)
 		}
 	}()
 
+	if !store.isOpen {
+		err = Err{{ .RecordName }}StoreClosed
+		return
+	}
+
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
 	updatedRR = make([]record.{{ .RecordName }}, len(newRR))
-	copy(updatedRR, newRR)
-
-	for _, updatedR := range updatedRR {
+	for i, updatedR := range newRR {
 		switch {
 		case updatedR.ID == 0:
 			// New record without an id.
@@ -251,13 +298,13 @@ func (store *{{ .RecordName }}Store) UpdateAll(newRR []record.{{ .RecordName }})
 				return
 			}
 			store.data.Records = append(store.data.Records, updatedR)
-		case updatedR.ID != 0:
+		default:
 			found := false
 			// Updating an existing record so replace it.
-			for i, r := range store.data.Records {
+			for j, r := range store.data.Records {
 				if r.ID == updatedR.ID {
 					found = true
-					store.data.Records[i] = updatedR
+					store.data.Records[j] = updatedR
 					break
 				}
 			}
@@ -266,14 +313,16 @@ func (store *{{ .RecordName }}Store) UpdateAll(newRR []record.{{ .RecordName }})
 				store.data.Records = append(store.data.Records, updatedR)
 			}
 		}
+		updatedRR[i] = updatedR
 	}
 	return
 }
 
-// Remove removes the record.{{ .RecordName }} from the data-store.
+// Remove removes the record.{{ .RecordName }} from the store.
 // Param id is the record ID of the record.{{ .RecordName }} to be removed.
 // If the record is not found returns a nil error.
 // Returns the error.
+// Blocks closes during it write to the store.
 func (store *{{ .RecordName }}Store) Remove(id uint64) (err error) {
 
 	defer func() {
@@ -281,6 +330,11 @@ func (store *{{ .RecordName }}Store) Remove(id uint64) (err error) {
 			err = fmt.Errorf("{{ .RecordName }}Store.Remove: %w", err)
 		}
 	}()
+
+	if !store.isOpen {
+		err = Err{{ .RecordName }}StoreClosed
+		return
+	}
 
 	store.lock.Lock()
 	defer store.lock.Unlock()
@@ -292,10 +346,10 @@ func (store *{{ .RecordName }}Store) Remove(id uint64) (err error) {
 	for i, r := range store.data.Records {
 		if r.ID == id {
 			found = true
-			records = make([]record.{{ .RecordName }}, l-1)
+			records = make([]record.{{ .RecordName }}, 0, l-1)
 			if i > 0 {
 				// Copy records preceding this unwanted record.
-				copy(records, store.data.Records[:i])
+				records = append(records, store.data.Records[:i]...)
 			}
 			// Skip over this unwanted record.
 			if i++; i < l {
@@ -310,10 +364,14 @@ func (store *{{ .RecordName }}Store) Remove(id uint64) (err error) {
 		return
 	}
 	store.data.Records = records
+	store.blockClose()
 	err = store.writeAll()
+	store.unBlockClose()
 	return
 }
 
+// readAll reads all the data from the store.
+// Uses no blocks.
 func (store *{{ .RecordName }}Store) readAll() (err error) {
 
 	defer func() {
@@ -353,6 +411,8 @@ func (store *{{ .RecordName }}Store) readAll() (err error) {
 	return
 }
 
+// writeAll writes the data to the store.
+// Uses no blocks.
 func (store *{{ .RecordName }}Store) writeAll() (err error) {
 
 	defer func() {
@@ -386,6 +446,7 @@ func (store *{{ .RecordName }}Store) writeAll() (err error) {
 
 // nextID returns the next available id.
 // Returns the error if there are no more ids.
+// No blocking is used.
 func (store *{{ .RecordName }}Store) nextID() (nextID uint64, err error) {
 
 	defer func() {
@@ -396,7 +457,7 @@ func (store *{{ .RecordName }}Store) nextID() (nextID uint64, err error) {
 
 
 	if store.IsFull() {
-		err = Err{{ .RecordName }}Full
+		err = Err{{ .RecordName }}StoreFull
 		return
 	}
 

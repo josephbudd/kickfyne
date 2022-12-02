@@ -19,9 +19,16 @@ func Build(
 		}
 	}()
 
+	var screenPackageNames []string
+	if screenPackageNames, err = utils.ScreenPackageNames(folderPaths); err != nil {
+		return
+	}
 	// gui/mainmenu/mainmenu.go
 	data := mainMenuTemplateData{
-		ImportPrefix: importPrefix,
+		ImportPrefix:       importPrefix,
+		ScreenPackageNames: screenPackageNames,
+		HomePackageName:    utils.HomeScreenPackageName,
+		Funcs:              utils.GetFuncs(),
 	}
 	oPath := filepath.Join(folderPaths.FrontendGUIMainMenu, mainMenuFileName)
 	if err = utils.ProcessTemplate(mainMenuFileName, oPath, mainMenuTemplate, data); err != nil {

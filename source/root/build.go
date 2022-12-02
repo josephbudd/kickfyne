@@ -36,22 +36,38 @@ func CreateFramework(
 	}
 
 	data = fyneAppTOMLData{
-		WebSiteURL: "https://" + importPrefix + "/",
-		AppName:    appName,
-		AppID:      strings.Join(appIDParts, "."),
+		WebSiteURL:      "https://" + importPrefix + "/",
+		AppName:         appName,
+		AppID:           strings.Join(appIDParts, "."),
+		HomePackageName: utils.HomeScreenPackageName,
 	}
 	if err = utils.ProcessTemplate(utils.FyneAppTOMLFileName, utils.FyneAppTOMLFilePath(folderPaths), dyneAppTOMLTemplate, data); err != nil {
+		return
+	}
+
+	var screenNames []string
+	if screenNames, err = utils.ScreenPackageNames(folderPaths); err != nil {
 		return
 	}
 
 	// ./main.go
 	oPath = filepath.Join(folderPaths.App, MainFileName)
 	data = mainTemplateData{
-		ImportPrefix: importPrefix,
-		AppName:      appName,
-		Funcs:        utils.GetFuncs(),
+		ImportPrefix:       importPrefix,
+		AppName:            appName,
+		ScreenPackageNames: screenNames,
+		HomePackageName:    utils.HomeScreenPackageName,
+		Funcs:              utils.GetFuncs(),
 	}
 	if err = utils.ProcessTemplate(MainFileName, oPath, mainTemplate, data); err != nil {
+		return
+	}
+	if err = RebuildMainScreensGo(
+		appName,
+		screenNames,
+		importPrefix,
+		folderPaths,
+	); err != nil {
 		return
 	}
 
@@ -65,5 +81,23 @@ func CreateFramework(
 		return
 	}
 
+	return
+}
+
+func RebuildMainScreensGo(
+	appName string,
+	sortedScreenNames []string,
+	importPrefix string,
+	folderPaths *utils.FolderPaths,
+) (err error) {
+	oPath := filepath.Join(folderPaths.App, ScreensFileName)
+	data := screensTemplateData{
+		ImportPrefix:       importPrefix,
+		AppName:            appName,
+		ScreenPackageNames: sortedScreenNames,
+		HomePackageName:    utils.HomeScreenPackageName,
+		Funcs:              utils.GetFuncs(),
+	}
+	err = utils.ProcessTemplate(ScreensFileName, oPath, screensTemplate, data)
 	return
 }

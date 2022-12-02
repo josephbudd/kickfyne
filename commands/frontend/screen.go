@@ -7,16 +7,17 @@ import (
 
 	"github.com/josephbudd/kickfyne/source/frontend/gui/screens"
 	"github.com/josephbudd/kickfyne/source/frontend/landingscreen"
+	"github.com/josephbudd/kickfyne/source/root"
 	"github.com/josephbudd/kickfyne/source/utils"
 )
 
-var noErr = fmt.Errorf("noErr")
+var errNil = fmt.Errorf("errNil")
 
 // handleScreen passes control to the correct handlers.
 func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix string) (err error) {
 
 	defer func() {
-		if err == noErr {
+		if err == errNil {
 			err = nil
 			return
 		}
@@ -26,13 +27,17 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 	}()
 
 	if !isBuilt {
-		fmt.Println("The app must be initailized before the front end panels can be added or removed.")
+		fmt.Println("The app must be initialized before the front end panels can be added or removed.")
 		return
 	}
 	if len(args) == 1 {
 		fmt.Println(UsageScreen())
 		return
 	}
+
+	// Need the app name when rebuilding main.go.
+	appName := filepath.Base(importPrefix)
+
 	// args[0] is "screen"
 	// args[1] is the verb
 	switch args[1] {
@@ -57,7 +62,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			return
 		}
 		screenDocComment := fmt.Sprintf("Package %s is a package.\nKICKFYNE TODO: Correct this package doc commment.", args[2])
-		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
+		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix, appName); err != nil {
 			return
 		}
 		fmt.Println(successMessageScreenAdd(
@@ -75,7 +80,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			return
 		}
 		screenDocComment := fmt.Sprintf("Package %s is an Accordion package.\nKICKFYNE TODO: Correct this package doc commment.", args[2])
-		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
+		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix, appName); err != nil {
 			return
 		}
 		var folderPaths *utils.FolderPaths
@@ -105,7 +110,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			return
 		}
 		screenDocComment := fmt.Sprintf("Package %s is an AppTabs package.\nKICKFYNE TODO: Correct this package doc commment.", args[2])
-		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
+		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix, appName); err != nil {
 			return
 		}
 		var folderPaths *utils.FolderPaths
@@ -135,7 +140,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			return
 		}
 		screenDocComment := fmt.Sprintf("Package %s is an DocTabs package.\nKICKFYNE TODO: Correct this package doc commment.", args[2])
-		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix); err != nil {
+		if err = handleScreenAdd(pathWD, args[2], screenDocComment, importPrefix, appName); err != nil {
 			return
 		}
 		var folderPaths *utils.FolderPaths
@@ -164,7 +169,7 @@ func handleScreen(pathWD string, args []string, isBuilt bool, importPrefix strin
 			fmt.Println(UsageScreen())
 			return
 		}
-		err = handleScreenRemove(pathWD, args[2], importPrefix)
+		err = handleScreenRemove(pathWD, args[2], importPrefix, appName)
 	case subCmdHelp:
 		// args[0] is "screen"
 		// args[1] is "help"
@@ -190,7 +195,7 @@ func handleScreenLanding(pathWD, importPrefix string) (err error) {
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
-			err = noErr
+			err = errNil
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)
@@ -226,7 +231,7 @@ func handleScreenLanding(pathWD, importPrefix string) (err error) {
 }
 
 // handleScreenAdd handles adding a screen package.
-func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix string) (err error) {
+func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix, appName string) (err error) {
 
 	var failureMessage string
 	defer func() {
@@ -237,7 +242,7 @@ func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix s
 		if len(failureMessage) > 0 {
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
-			err = noErr
+			err = errNil
 		}
 	}()
 
@@ -259,11 +264,17 @@ func handleScreenAdd(pathWD, screenPackageName, screenPackageDoc, importPrefix s
 	); err != nil {
 		return
 	}
+	// Rebuild main.go.
+	var screenPackageNames []string
+	if screenPackageNames, err = utils.ScreenPackageNames(folderPaths); err != nil {
+		return
+	}
+	root.RebuildMainScreensGo(appName, screenPackageNames, importPrefix, folderPaths)
 	return
 }
 
 // handleScreenRemove handles the removal of a screen package.
-func handleScreenRemove(pathWD, screenPackageName, importPrefix string) (err error) {
+func handleScreenRemove(pathWD, screenPackageName, importPrefix, appName string) (err error) {
 
 	var failureMessage string
 	var successMessage string
@@ -276,7 +287,7 @@ func handleScreenRemove(pathWD, screenPackageName, importPrefix string) (err err
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
-			err = noErr
+			err = errNil
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)
@@ -310,6 +321,12 @@ func handleScreenRemove(pathWD, screenPackageName, importPrefix string) (err err
 	}
 	// Removed the folder.
 	successMessage = fmt.Sprintf("Removed the screen package %q.", screenPackageName)
+	// Rebuild main.go.
+	var screenPackageNames []string
+	if screenPackageNames, err = utils.ScreenPackageNames(folderPaths); err != nil {
+		return
+	}
+	root.RebuildMainScreensGo(appName, screenPackageNames, importPrefix, folderPaths)
 	return
 }
 
@@ -327,7 +344,7 @@ func handleScreenList(pathWD, importPrefix string) (err error) {
 		case len(failureMessage) > 0:
 			fmt.Println("Failure:")
 			fmt.Println(failureMessage)
-			err = noErr
+			err = errNil
 		case len(successMessage) > 0:
 			fmt.Println("Success:")
 			fmt.Println(successMessage)

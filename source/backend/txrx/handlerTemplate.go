@@ -18,8 +18,6 @@ import (
 	"{{ .ImportPrefix }}/backend/store"
 )
 
-const {{ $dCMessageName }}F = "receive{{ .MessageName }}: %s"
-
 func init() {
 	addReceiver(message.{{ .MessageName }}ID, receive{{ .MessageName }})
 }
@@ -27,16 +25,17 @@ func init() {
 func receive{{ .MessageName }}(ctx context.Context, ctxCancel context.CancelFunc, stores *store.Stores, msg interface{}) {
 
 	{{ $dCMessageName }}Msg := msg.(*message.{{ .MessageName }})
-	var err, fatal error
+	var fatal error
+	var userMessage string
 	defer func() {
 		switch {
 		case fatal != nil:
 			{{ $dCMessageName }}Msg.Fatal = true
-			{{ $dCMessageName }}Msg.ErrorMessage = fmt.Sprintf({{ $dCMessageName }}F, fatal.Error())
+			{{ $dCMessageName }}Msg.ErrorMessage = fmt.Sprintf("receive{{ .MessageName }}: %s", fatal.Error())
 			Send({{ $dCMessageName }}Msg)
-		case err != nil:
+		case len(userMessage) > 0:
 			{{ $dCMessageName }}Msg.Error = true
-			{{ $dCMessageName }}Msg.ErrorMessage = fmt.Sprintf({{ $dCMessageName }}F, err.Error())
+			{{ $dCMessageName }}Msg.ErrorMessage = userMessage
 			Send({{ $dCMessageName }}Msg)
 		default:
 			// No errors so return the {{ $dCMessageName }}Msg.
@@ -47,7 +46,7 @@ func receive{{ .MessageName }}(ctx context.Context, ctxCancel context.CancelFunc
 	/* KICKFYNE TODO:
 	Do something with this message.
 	Use fatal for unrecoverable errors.
-	Use err for user error messages.
+	Use userMessage for user error messages.
 	*/
 }
 

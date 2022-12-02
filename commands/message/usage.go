@@ -39,7 +39,7 @@ MANAGING MESSAGES:
 ` + strings.Join(commands, "\n") + `
 * Message definitions are at "shared/message/".
 * The back-end message handlers are at "backend/txrx/"
-* The front-end message handlers are in each screen's messageHandler.go file.
+* The front-end message handlers are in each screen's messageHandler.go file and contain instructions for handling messages.
 * A message name is upper camel case so a valid message name might be "AddContact".
 
 After a message is added:

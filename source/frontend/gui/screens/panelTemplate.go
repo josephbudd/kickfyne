@@ -45,7 +45,7 @@ func new{{ call .Funcs.Cap .PanelName }}Components(screen *screenComponents) (pa
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("{{ .PackageName }}.new{{ call .Funcs.Cap .PanelName }}: %w", err)
+			err = fmt.Errorf("{{ .PackageName }}.new{{ call .Funcs.Cap .PanelName }}Components: %w", err)
 		}
 	}()
 

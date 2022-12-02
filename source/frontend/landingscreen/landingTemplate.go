@@ -12,41 +12,21 @@ const (
 
 
 import (
-	"context"
-	"fmt"
-
-	"fyne.io/fyne/v2"
-
 	"{{ .ImportPrefix }}/frontend/gui"
 	"{{ .ImportPrefix }}/frontend/gui/screens/{{ .LandingScreenName }}"
 )
 
 var landingScreen gui.CanvasObjectProvider
-var landingScreenErr error
 
 // Init binds the landing screen to the app window.
-func Init(ctx context.Context, ctxCancelFunc context.CancelFunc, app fyne.App, window fyne.Window) (err error) {
-
-	defer func() {
-		if landingScreenErr != nil {
-			landingScreenErr = fmt.Errorf("landingscreen.Init: %w", landingScreenErr)
-		}
-		err = landingScreenErr
-	}()
-
-	// Show the landing screen.
-	if landingScreen, landingScreenErr = {{ .LandingScreenName }}.New(ctx, ctxCancelFunc, app, window); err != nil {
-		return
-	}
+func Init() {
+	landingScreen = {{ .LandingScreenName }}.CanvasObjectProvider()
+	// Show the landing screen right away even if it's not full of content.
 	landingScreen.BindToWindow()
-	return
 }
 
 // Land binds the landing to the window.
 func Land() {
-	if landingScreenErr != nil {
-		return
-	}
 	landingScreen.BindToWindow()
 }
 
